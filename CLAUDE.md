@@ -44,7 +44,7 @@ src/types/zzfx.d.ts         Tipos mínimos de zzfx.
 - `initAudio()` (en `PreloadScene.create`) sintetiza con ZzFX cada sonido de `SFX`/`SONGS` **que no esté ya
   en `cache.audio`**. Por eso, para poner un sonido definitivo basta con `this.load.audio('<clave>', [...])`
   en `PreloadScene.preload()`: tiene prioridad sobre el provisional.
-- Claves: `jump_moni`, `jump_relampago`, `land`, `duck`, `hit`, `gameover`, `record`, `milestone`,
+- Claves: `jump_moni`, `jump_relampago`, `doublejump`, `land`, `duck`, `hit`, `gameover`, `record`, `milestone`,
   `ui_select`, `ui_start`, `music_menu`, `music_game`.
 - Volúmenes y variación de tono en `AUDIO` (config.ts). Silencio guardado en `localStorage` (`moni.muted`).
 - **No leer `scene.sound.mute`** para saber si está silenciado: Phaser lo calcula a partir del gain del nodo
@@ -90,6 +90,8 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - Resolución lógica 1280x720, `GROUND_Y = 620`, jugador fijo en x=220, escala de personaje 0.55 (~120 px).
 - **Salto**: ESPACIO / ↑ / W / clic / toque en los 2/3 derechos. Salto variable (soltar corta la subida),
   *coyote time* 90 ms y *jump buffer* 130 ms.
+- **Salto doble (solo Moni)**: pulsar saltar otra vez en el aire, una vez por salto (`DOUBLE_JUMP` en config.ts).
+  Si faltan menos de `jumpBufferMs` para aterrizar, la pulsación se guarda para el salto normal.
 - **Agacharse**: ↓ / S / toque en el tercio izquierdo. En el aire acelera la caída.
 - **Hitboxes** más pequeñas que el dibujo (55-82 % en el jugador, `hitbox` por obstáculo en config.ts).
 - **Velocidad** 430 → 1100 px/s (+9 px/s²). Hueco entre obstáculos aleatorio entre 0,75 y 1,6 × velocidad.
@@ -98,7 +100,7 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú y partida).
-- Los dos personajes juegan igual por ahora (las habilidades están en TAREAS).
+- El dash de Relámpago está pendiente (ver TAREAS).
 
 ## Dirección de arte (para generar imágenes nuevas)
 

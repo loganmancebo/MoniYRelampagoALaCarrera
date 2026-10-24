@@ -26,6 +26,13 @@ export const PHYSICS = {
   jumpBufferMs: 130,
 };
 
+// Habilidad de Moni: un segundo salto en el aire, algo más flojo que el primero.
+// Altura del salto ≈ v² / (2 · gravedad): 1050 → ~210 px; con el doble, hasta ~380 px.
+export const DOUBLE_JUMP = {
+  velocity: 950,
+  stretchMs: 110, // estirón del sprite (provisional hasta tener el arte `moni_doublejump`)
+};
+
 export const SPEED = {
   start: 430,
   max: 1100,

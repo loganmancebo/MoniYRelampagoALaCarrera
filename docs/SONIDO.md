@@ -11,6 +11,7 @@ el código del juego** (ver "Sustituir un sonido por un archivo").
 | Clave | Cuándo suena | Dónde se dispara |
 |---|---|---|
 | `jump_moni` | Moni salta ("boing" que sube) | `GameScene.updatePlayer` |
+| `doublejump` | Moni hace el salto doble ("boing" más agudo con subida) | `GameScene.doubleJump` |
 | `jump_relampago` | Relámpago salta ("bzzt" eléctrico) | `GameScene.updatePlayer` |
 | `land` | Al tocar el suelo tras un salto | `GameScene.updatePlayer` |
 | `duck` | Al empezar a agacharse en el suelo | `GameScene.setDucking` |

@@ -6,6 +6,7 @@ import {
   AUDIO,
   CHAR_SCALE,
   CharacterKey,
+  DOUBLE_JUMP,
   FRAME,
   GROUND_Y,
   HEIGHT,
@@ -43,6 +44,7 @@ export class GameScene extends Phaser.Scene {
   private wasOnGround = true;
   private lastGroundTime = 0;
   private lastJumpPress = -Infinity;
+  private canDoubleJump = false;
 
   private keys!: Keys;
   private touchJump = false;
@@ -63,6 +65,7 @@ export class GameScene extends Phaser.Scene {
     this.ducking = false;
     this.wasOnGround = true;
     this.lastJumpPress = -Infinity;
+    this.canDoubleJump = false;
     this.touchJump = this.touchDuck = false;
   }
 
@@ -155,7 +158,10 @@ export class GameScene extends Phaser.Scene {
     const jumpHeld = this.keys.space.isDown || this.keys.up.isDown || this.keys.w.isDown || this.touchJump;
     const duckHeld = this.keys.down.isDown || this.keys.s.isDown || this.touchDuck;
 
-    if (onGround) this.lastGroundTime = time;
+    if (onGround) {
+      this.lastGroundTime = time;
+      this.canDoubleJump = this.character === 'moni';
+    }
     if (onGround && !this.wasOnGround) playSfx(this, 'land');
     this.wasOnGround = onGround;
 
@@ -167,6 +173,8 @@ export class GameScene extends Phaser.Scene {
       this.lastGroundTime = -Infinity;
       this.setDucking(false);
       playSfx(this, `jump_${this.character}`);
+    } else if (this.lastJumpPress > this.lastGroundTime && this.canDoubleJump && !this.aboutToLand(body)) {
+      this.doubleJump(body);
     }
     if (!jumpHeld && body.velocity.y < -PHYSICS.jumpCutVelocity) {
       body.setVelocityY(-PHYSICS.jumpCutVelocity);
@@ -185,6 +193,36 @@ export class GameScene extends Phaser.Scene {
       if (!this.player.anims.isPlaying) this.player.play(`${this.character}-run`);
       this.player.anims.timeScale = this.speed / SPEED.start;
     }
+  }
+
+  // Si está a punto de tocar el suelo, la pulsación se guarda para el salto normal (jump buffer)
+  // en lugar de gastar el salto doble.
+  private aboutToLand(body: Body) {
+    // Tiempo hasta el suelo resolviendo d = v·t + g·t²/2.
+    const g = this.physics.world.gravity.y + body.gravity.y;
+    const v = body.velocity.y;
+    const d = Math.max(0, GROUND_Y - body.bottom);
+    const t = (-v + Math.sqrt(v * v + 2 * g * d)) / g;
+    return t * 1000 <= PHYSICS.jumpBufferMs;
+  }
+
+  private doubleJump(body: Body) {
+    body.setVelocityY(-DOUBLE_JUMP.velocity);
+    this.canDoubleJump = false;
+    this.lastJumpPress = -Infinity;
+    playSfx(this, 'doublejump');
+
+    // Provisional hasta tener el arte `moni_doublejump`: estirón del sprite y un anillo de aire bajo los pies.
+    this.tweens.add({
+      targets: this.player,
+      scaleX: CHAR_SCALE * 0.88,
+      scaleY: CHAR_SCALE * 1.1,
+      duration: DOUBLE_JUMP.stretchMs,
+      yoyo: true,
+      onComplete: () => this.player.setScale(CHAR_SCALE),
+    });
+    const puff = this.add.ellipse(this.player.x, this.player.y, 50, 14).setStrokeStyle(4, 0xf7f0e4).setDepth(9);
+    this.tweens.add({ targets: puff, scaleX: 2.2, scaleY: 1.6, alpha: 0, duration: 280, onComplete: () => puff.destroy() });
   }
 
   private setDucking(ducking: boolean) {
@@ -256,6 +294,7 @@ export class GameScene extends Phaser.Scene {
     this.dead = true;
     this.physics.pause();
     this.tweens.killAll();
+    this.player.setScale(CHAR_SCALE);
     this.player.anims.stop();
     this.player.setFrame(FRAME.hit);
     this.cameras.main.shake(180, 0.008);

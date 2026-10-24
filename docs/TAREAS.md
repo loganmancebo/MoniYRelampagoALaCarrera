@@ -31,14 +31,17 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] Música definitiva del menú y de la partida (60-90 s en bucle)
 - [ ] Opcional: script `npm run audio` con ffmpeg (convertir, recortar silencios, normalizar)
 - [ ] Opcional: avisos sonoros de peligro (`thunder` al aparecer la nube, `buzz` de la abeja)
-- [ ] Sonidos de las habilidades de la Fase 2: `doublejump`, `dash`, `recharge`
+- [x] Sonido provisional del salto doble (`doublejump`)
+- [ ] Sonidos de las habilidades de la Fase 2: `dash`, `recharge`
 - [ ] Probar en iPhone: interruptor de silencio físico y desbloqueo del audio al primer toque
 - [ ] Opcional: volúmenes separados de música y efectos en un menú de opciones
 
 ## Fase 2 · Personalidad de cada personaje
 
-- [ ] **Moni: salto doble**, pulsando saltar otra vez en el aire. Usar el frame de salto o, mejor, un frame
-      de giro con las orejas como hélice (arte del bloque 2: `moni_doublejump`, 3 frames).
+- [x] **Moni: salto doble**, pulsando saltar otra vez en el aire (`DOUBLE_JUMP` en config.ts, sonido `doublejump`).
+      Efecto provisional: estirón del sprite y anillo de aire bajo los pies. Si se pulsa justo antes de
+      aterrizar, cuenta como salto normal (jump buffer) y no gasta el doble.
+- [ ] Moni: usar el arte `moni_doublejump` (3 frames, giro con las orejas como hélice) cuando exista.
 - [ ] **Relámpago: dash eléctrico**, una tecla (p. ej. → o D) o deslizar el dedo. Atraviesa un obstáculo
       y luego se recarga en unos 5 s. Mostrar la recarga en la interfaz. Arte: `relampago_dash`, 3 frames.
 - [ ] Decidir si la nube de tormenta "recarga" a Relámpago al atravesarla con el dash.
