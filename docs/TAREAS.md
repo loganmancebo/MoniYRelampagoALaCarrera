@@ -32,7 +32,7 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] Opcional: script `npm run audio` con ffmpeg (convertir, recortar silencios, normalizar)
 - [ ] Opcional: avisos sonoros de peligro (`thunder` al aparecer la nube, `buzz` de la abeja)
 - [x] Sonido provisional del salto doble (`doublejump`)
-- [ ] Sonidos de las habilidades de la Fase 2: `dash`, `recharge`
+- [x] Sonidos provisionales del dash (`dash`) y de la recarga (`recharge`)
 - [ ] Probar en iPhone: interruptor de silencio físico y desbloqueo del audio al primer toque
 - [ ] Opcional: volúmenes separados de música y efectos en un menú de opciones
 
@@ -42,8 +42,12 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
       Efecto provisional: estirón del sprite y anillo de aire bajo los pies. Si se pulsa justo antes de
       aterrizar, cuenta como salto normal (jump buffer) y no gasta el doble.
 - [ ] Moni: usar el arte `moni_doublejump` (3 frames, giro con las orejas como hélice) cuando exista.
-- [ ] **Relámpago: dash eléctrico**, una tecla (p. ej. → o D) o deslizar el dedo. Atraviesa un obstáculo
-      y luego se recarga en unos 5 s. Mostrar la recarga en la interfaz. Arte: `relampago_dash`, 3 frames.
+- [x] **Relámpago: dash eléctrico** con → / D o el botón del rayo (abajo a la derecha, que también muestra
+      la recarga). Durante 0,38 s el mundo va 2,2× más rápido y atraviesa lo que toque; recarga de 5 s
+      (`DASH` en config.ts, sonidos `dash` y `recharge`). Efecto provisional: tinte amarillo y estelas.
+- [ ] Relámpago: usar el arte `relampago_dash` (3 frames) cuando exista.
+- [ ] Valorar activar el dash deslizando el dedo (ahora el toque salta al apoyar el dedo, antes de saber
+      si es un deslizamiento; por eso de momento hay botón).
 - [ ] Decidir si la nube de tormenta "recarga" a Relámpago al atravesarla con el dash.
 - [ ] Equilibrar: ¿un personaje es claramente mejor? Ajustar la recarga y la altura del salto doble.
 - [ ] Mostrar en el menú una línea con la habilidad de cada personaje.

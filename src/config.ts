@@ -33,6 +33,16 @@ export const DOUBLE_JUMP = {
   stretchMs: 110, // estirón del sprite (provisional hasta tener el arte `moni_doublejump`)
 };
 
+// Habilidad de Relámpago: dash eléctrico que atraviesa los obstáculos que toque mientras dura.
+export const DASH = {
+  durationMs: 380,
+  speedMultiplier: 2.2, // el mundo va más rápido durante el dash (a 430 px/s recorre ~360 px)
+  forwardPx: 50, // el personaje se adelanta un poco y vuelve a su sitio
+  cooldownMs: 5000, // recarga, contada desde que termina el dash
+  tint: 0xffe680,
+  trailEveryMs: 40, // estelas (provisional hasta tener el arte `relampago_dash`)
+};
+
 export const SPEED = {
   start: 430,
   max: 1100,

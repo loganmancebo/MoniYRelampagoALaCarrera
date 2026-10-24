@@ -35,6 +35,7 @@ src/audio/sounds.ts         Definición de efectos (parámetros ZzFX), instrumen
 src/audio/render.ts         Sintetiza efectos y canciones a muestras de audio.
 src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMusicRate, stopMusic, toggleMute.
 src/ui/MuteButton.ts        Botón de silencio dibujado (arriba a la izquierda) + tecla M.
+src/ui/DashButton.ts        Botón del dash de Relámpago con indicador de recarga.
 src/types/zzfx.d.ts         Tipos mínimos de zzfx.
 ```
 
@@ -44,7 +45,7 @@ src/types/zzfx.d.ts         Tipos mínimos de zzfx.
 - `initAudio()` (en `PreloadScene.create`) sintetiza con ZzFX cada sonido de `SFX`/`SONGS` **que no esté ya
   en `cache.audio`**. Por eso, para poner un sonido definitivo basta con `this.load.audio('<clave>', [...])`
   en `PreloadScene.preload()`: tiene prioridad sobre el provisional.
-- Claves: `jump_moni`, `jump_relampago`, `doublejump`, `land`, `duck`, `hit`, `gameover`, `record`, `milestone`,
+- Claves: `jump_moni`, `jump_relampago`, `doublejump`, `dash`, `recharge`, `land`, `duck`, `hit`, `gameover`, `record`, `milestone`,
   `ui_select`, `ui_start`, `music_menu`, `music_game`.
 - Volúmenes y variación de tono en `AUDIO` (config.ts). Silencio guardado en `localStorage` (`moni.muted`).
 - **No leer `scene.sound.mute`** para saber si está silenciado: Phaser lo calcula a partir del gain del nodo
@@ -100,7 +101,9 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú y partida).
-- El dash de Relámpago está pendiente (ver TAREAS).
+- **Dash (solo Relámpago)**: → / D o el botón del rayo (abajo a la derecha, `src/ui/DashButton.ts`, que muestra
+  la recarga). Durante el dash el mundo va más rápido y los obstáculos que toca quedan marcados como
+  `dashed` (ya no matan aunque siga encima al terminar). Valores en `DASH` (config.ts).
 
 ## Dirección de arte (para generar imágenes nuevas)
 

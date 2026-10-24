@@ -12,6 +12,8 @@ el código del juego** (ver "Sustituir un sonido por un archivo").
 |---|---|---|
 | `jump_moni` | Moni salta ("boing" que sube) | `GameScene.updatePlayer` |
 | `doublejump` | Moni hace el salto doble ("boing" más agudo con subida) | `GameScene.doubleJump` |
+| `dash` | Relámpago hace el dash ("zas" eléctrico que baja) | `GameScene.tryDash` |
+| `recharge` | El dash vuelve a estar listo | `GameScene.updateDash` |
 | `jump_relampago` | Relámpago salta ("bzzt" eléctrico) | `GameScene.updatePlayer` |
 | `land` | Al tocar el suelo tras un salto | `GameScene.updatePlayer` |
 | `duck` | Al empezar a agacharse en el suelo | `GameScene.setDucking` |

@@ -6,6 +6,7 @@ import {
   AUDIO,
   CHAR_SCALE,
   CharacterKey,
+  DASH,
   DOUBLE_JUMP,
   FRAME,
   GROUND_Y,
@@ -19,11 +20,12 @@ import {
 } from '../config';
 import { ASSET_META } from '../generated/assets';
 import { getHighScore, setHighScore } from '../storage';
+import { DashButton } from '../ui/DashButton';
 import { MuteButton } from '../ui/MuteButton';
 import { Background, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
-type Keys = Record<'space' | 'up' | 'w' | 'down' | 's', Phaser.Input.Keyboard.Key>;
+type Keys = Record<'space' | 'up' | 'w' | 'down' | 's' | 'right' | 'd', Phaser.Input.Keyboard.Key>;
 
 const PLAYER_X = 220;
 
@@ -45,6 +47,10 @@ export class GameScene extends Phaser.Scene {
   private lastGroundTime = 0;
   private lastJumpPress = -Infinity;
   private canDoubleJump = false;
+  private dashUntil = 0;
+  private dashReadyAt = 0;
+  private dashReadyNotified = true;
+  private dashButton?: DashButton;
 
   private keys!: Keys;
   private touchJump = false;
@@ -66,6 +72,9 @@ export class GameScene extends Phaser.Scene {
     this.wasOnGround = true;
     this.lastJumpPress = -Infinity;
     this.canDoubleJump = false;
+    this.dashUntil = this.dashReadyAt = 0;
+    this.dashReadyNotified = true;
+    this.dashButton = undefined;
     this.touchJump = this.touchDuck = false;
   }
 
@@ -83,7 +92,12 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, floor);
 
     this.obstacles = this.physics.add.group({ allowGravity: false, immovable: true });
-    this.physics.add.overlap(this.player, this.obstacles, () => this.gameOver());
+    // Lo que toca durante el dash queda "atravesado" y ya no cuenta, aunque siga encima al terminar.
+    this.physics.add.overlap(this.player, this.obstacles, () => this.gameOver(), (_p, o) => {
+      const obstacle = o as Phaser.GameObjects.GameObject;
+      if (this.isDashing()) obstacle.setData('dashed', true);
+      return !obstacle.getData('dashed');
+    });
 
     this.scoreText = this.add
       .text(WIDTH - 32, 28, '', { ...TEXT_STYLE, fontSize: '34px' })
@@ -92,16 +106,18 @@ export class GameScene extends Phaser.Scene {
     this.updateScoreText();
 
     new MuteButton(this, 48, 48);
+    if (this.character === 'relampago') this.dashButton = new DashButton(this, WIDTH - 70, HEIGHT - 66, () => this.tryDash());
     this.setupInput();
     playMusic(this, 'music_game');
   }
 
   private setupInput() {
     const kb = this.input.keyboard!;
-    this.keys = kb.addKeys({ space: 'SPACE', up: 'UP', w: 'W', down: 'DOWN', s: 'S' }) as Keys;
+    this.keys = kb.addKeys({ space: 'SPACE', up: 'UP', w: 'W', down: 'DOWN', s: 'S', right: 'RIGHT', d: 'D' }) as Keys;
     for (const k of [this.keys.space, this.keys.up, this.keys.w]) {
       k.on('down', () => (this.lastJumpPress = this.time.now));
     }
+    for (const k of [this.keys.right, this.keys.d]) k.on('down', () => this.tryDash());
     // Táctil: tercio izquierdo agacharse, resto saltar. Con ratón, clic = saltar.
     // Los toques sobre botones (p. ej. silencio) no cuentan.
     this.input.on('pointerdown', (p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
@@ -136,11 +152,12 @@ export class GameScene extends Phaser.Scene {
     const dt = Math.min(delta, 50) / 1000;
 
     this.speed = Math.min(SPEED.max, this.speed + SPEED.accel * dt);
-    const dx = this.speed * dt;
+    const dx = this.worldSpeed() * dt;
     this.background.scroll(dx);
     setMusicRate(1 + ((this.speed - SPEED.start) / (SPEED.max - SPEED.start)) * AUDIO.musicMaxRateBoost);
 
     this.updatePlayer(time);
+    this.updateDash(time);
     this.updateObstacles(dx);
 
     this.score += dx * SCORE_PER_PX;
@@ -225,6 +242,57 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets: puff, scaleX: 2.2, scaleY: 1.6, alpha: 0, duration: 280, onComplete: () => puff.destroy() });
   }
 
+  private isDashing() {
+    return this.time.now < this.dashUntil;
+  }
+
+  private worldSpeed() {
+    return this.speed * (this.isDashing() ? DASH.speedMultiplier : 1);
+  }
+
+  private tryDash() {
+    const now = this.time.now;
+    if (this.character !== 'relampago' || this.dead || now < this.dashReadyAt) return;
+    this.dashUntil = now + DASH.durationMs;
+    this.dashReadyAt = this.dashUntil + DASH.cooldownMs;
+    this.dashReadyNotified = false;
+    playSfx(this, 'dash');
+
+    // Provisional hasta tener el arte `relampago_dash`: tinte, adelantarse un poco y estelas.
+    this.player.setTint(DASH.tint);
+    this.tweens.add({ targets: this.player, x: PLAYER_X + DASH.forwardPx, duration: DASH.durationMs / 2, yoyo: true, ease: 'Sine.Out' });
+    this.time.addEvent({
+      delay: DASH.trailEveryMs,
+      repeat: Math.floor(DASH.durationMs / DASH.trailEveryMs) - 1,
+      callback: () => this.addDashTrail(),
+    });
+  }
+
+  private addDashTrail() {
+    if (this.dead) return;
+    const p = this.player;
+    const ghost = this.add
+      .image(p.x, p.y, p.texture.key, p.frame.name)
+      .setOrigin(0.5, 1)
+      .setScale(p.scaleX, p.scaleY)
+      .setTint(DASH.tint)
+      .setAlpha(0.5)
+      .setDepth(p.depth - 1);
+    this.tweens.add({ targets: ghost, x: ghost.x - 70, alpha: 0, duration: 220, onComplete: () => ghost.destroy() });
+  }
+
+  private updateDash(time: number) {
+    if (!this.dashButton) return;
+    if (!this.isDashing() && this.player.isTinted) this.player.clearTint();
+    const cooldownStart = this.dashReadyAt - DASH.cooldownMs;
+    this.dashButton.setCharge(this.isDashing() ? 0 : (time - cooldownStart) / DASH.cooldownMs);
+    if (!this.dashReadyNotified && time >= this.dashReadyAt) {
+      this.dashReadyNotified = true;
+      playSfx(this, 'recharge', 0);
+      this.dashButton.pulse();
+    }
+  }
+
   private setDucking(ducking: boolean) {
     if (ducking === this.ducking) return;
     this.ducking = ducking;
@@ -234,7 +302,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateObstacles(dx: number) {
     for (const o of this.obstacles.getChildren() as Phaser.Physics.Arcade.Image[]) {
-      o.setVelocityX(-this.speed);
+      o.setVelocityX(-this.worldSpeed());
       if (o.x < -200) o.destroy();
     }
     this.distanceToSpawn -= dx;
@@ -294,7 +362,7 @@ export class GameScene extends Phaser.Scene {
     this.dead = true;
     this.physics.pause();
     this.tweens.killAll();
-    this.player.setScale(CHAR_SCALE);
+    this.player.setScale(CHAR_SCALE).clearTint();
     this.player.anims.stop();
     this.player.setFrame(FRAME.hit);
     this.cameras.main.shake(180, 0.008);
