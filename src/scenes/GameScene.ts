@@ -210,7 +210,8 @@ export class GameScene extends Phaser.Scene {
 
     const [tw, th] = ASSET_META.obstacles[def.key];
     const scale = def.height / th;
-    const y = def.air ? GROUND_Y - Phaser.Utils.Array.GetRandom(AIR_LEVELS) : GROUND_Y + 4;
+    const sink = def.sink ?? 0;
+    const y = def.air ? GROUND_Y - Phaser.Utils.Array.GetRandom(AIR_LEVELS) : GROUND_Y + 4 + sink;
     const o = this.obstacles.create(WIDTH + 150, y, `obstacle_${def.key}`) as Phaser.Physics.Arcade.Sprite;
     o.setOrigin(0.5, 1).setScale(scale).setDepth(def.air ? 12 : 8);
 
@@ -218,7 +219,7 @@ export class GameScene extends Phaser.Scene {
     const bw = tw * def.hitbox[0];
     const bh = th * def.hitbox[1];
     body.setSize(bw, bh, false);
-    body.setOffset((tw - bw) / 2, def.air ? (th - bh) / 2 : th - bh);
+    body.setOffset((tw - bw) / 2, def.air ? (th - bh) / 2 : th - bh - sink / scale);
 
     this.decorate(o, def);
 

@@ -50,6 +50,7 @@ export interface ObstacleDef {
   hitbox: [number, number]; // fracción del ancho y alto del dibujo que cuenta como choque
   air?: boolean;
   anim?: string;
+  sink?: number; // px que se hunde en la tierra (la hitbox no se mueve, sigue sobre el suelo)
   weight: number;
 }
 
@@ -59,8 +60,8 @@ export const OBSTACLES: ObstacleDef[] = [
   { key: 'rock', height: 62, hitbox: [0.8, 0.8], weight: 3 },
   { key: 'fence', height: 66, hitbox: [0.85, 0.75], weight: 2 },
   { key: 'rod', height: 135, hitbox: [0.45, 0.92], weight: 2 },
-  { key: 'stump', height: 96, hitbox: [0.65, 0.85], weight: 2 },
-  { key: 'puddle', height: 52, hitbox: [0.7, 0.4], weight: 2 },
+  { key: 'stump', height: 96, hitbox: [0.65, 0.85], sink: 16, weight: 2 },
+  { key: 'puddle', height: 52, hitbox: [0.7, 0.4], sink: 14, weight: 2 },
   { key: 'stones', height: 48, hitbox: [0.85, 0.8], weight: 2 },
   { key: 'cloud1', height: 92, hitbox: [0.7, 0.55], air: true, anim: 'cloud', weight: 2 },
   { key: 'bee1', height: 68, hitbox: [0.6, 0.6], air: true, weight: 2 },
