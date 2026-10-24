@@ -10,7 +10,8 @@
     "assets": "node tools/process-assets.mjs"
   },
   "dependencies": {
-    "phaser": "^3.90.0"
+    "phaser": "^3.90.0",
+    "zzfx": "^1.4.0"
   },
   "devDependencies": {
     "sharp": "^0.34.2",

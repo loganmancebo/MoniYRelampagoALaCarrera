@@ -13,11 +13,27 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [x] Velocidad progresiva, puntuación, récord en localStorage
 - [x] Game over con reintento y vuelta al menú
 - [x] Modo `?debug` con hitboxes
+- [x] Repositorio conectado a GitHub
 
-## 🔜 Siguiente: subir a GitHub
+## 🔊 Sonido (detalle en [SONIDO.md](SONIDO.md))
 
-- [ ] Conectar el remoto y hacer el primer push
-      (`git branch -M main`, `git remote add origin …`, `git push -u origin main`)
+**Hecho: sonido provisional con ZzFX**
+- [x] Sistema de audio por claves sobre el SoundManager de Phaser (`src/audio/`)
+- [x] Efectos: salto distinto por personaje, aterrizar, agacharse, choque, game over, récord, cada 100 puntos, menú
+- [x] Música provisional del menú y de la partida, en bucle; la de la partida acelera con la velocidad
+- [x] Variación de tono en los efectos repetidos
+- [x] Botón de silencio + tecla M, guardado en localStorage
+
+**Pendiente**
+- [ ] Escuchar y ajustar volúmenes jugando (`AUDIO` en config.ts y volumen de cada efecto en `SFX`)
+- [ ] Decidir la fuente de los sonidos definitivos (IA, librerías CC0 o mantener ZzFX)
+- [ ] Sonidos definitivos: efectos (WAV → OGG + MP3) en `public/audio/` y cargarlos en `PreloadScene`
+- [ ] Música definitiva del menú y de la partida (60-90 s en bucle)
+- [ ] Opcional: script `npm run audio` con ffmpeg (convertir, recortar silencios, normalizar)
+- [ ] Opcional: avisos sonoros de peligro (`thunder` al aparecer la nube, `buzz` de la abeja)
+- [ ] Sonidos de las habilidades de la Fase 2: `doublejump`, `dash`, `recharge`
+- [ ] Probar en iPhone: interruptor de silencio físico y desbloqueo del audio al primer toque
+- [ ] Opcional: volúmenes separados de música y efectos en un menú de opciones
 
 ## Fase 2 · Personalidad de cada personaje
 
@@ -42,8 +58,8 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 
 ## Fase 4 · Pulido y sensación de juego
 
-- [ ] **Sonido**: salto, aterrizaje, choque, cada 100 puntos, dash y salto doble. Música en bucle.
-- [ ] Botón de silencio (guardar la preferencia en localStorage).
+- [x] **Sonido** provisional (ver sección Sonido arriba)
+- [x] Botón de silencio (guardado en localStorage)
 - [ ] **Pausa**: tecla P / Esc y botón en pantalla. Pausar también al perder el foco.
 - [ ] Partículas: polvo al aterrizar (`fx_dust`), chispas en el dash (`fx_spark`).
 - [ ] *Squash & stretch* del personaje al saltar y aterrizar.

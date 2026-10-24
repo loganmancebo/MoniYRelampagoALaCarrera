@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
+import { playMusic, playSfx, setMusicRate, stopMusic } from '../audio';
 import {
   AIR_LEVELS,
   AIR_OBSTACLES_FROM_SCORE,
+  AUDIO,
   CHAR_SCALE,
   CharacterKey,
   FRAME,
@@ -16,6 +18,7 @@ import {
 } from '../config';
 import { ASSET_META } from '../generated/assets';
 import { getHighScore, setHighScore } from '../storage';
+import { MuteButton } from '../ui/MuteButton';
 import { Background, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
@@ -37,6 +40,7 @@ export class GameScene extends Phaser.Scene {
   private distanceToSpawn = 0;
   private dead = false;
   private ducking = false;
+  private wasOnGround = true;
   private lastGroundTime = 0;
   private lastJumpPress = -Infinity;
 
@@ -57,6 +61,7 @@ export class GameScene extends Phaser.Scene {
     this.distanceToSpawn = 600;
     this.dead = false;
     this.ducking = false;
+    this.wasOnGround = true;
     this.lastJumpPress = -Infinity;
     this.touchJump = this.touchDuck = false;
   }
@@ -83,7 +88,9 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20);
     this.updateScoreText();
 
+    new MuteButton(this, 48, 48);
     this.setupInput();
+    playMusic(this, 'music_game');
   }
 
   private setupInput() {
@@ -93,8 +100,9 @@ export class GameScene extends Phaser.Scene {
       k.on('down', () => (this.lastJumpPress = this.time.now));
     }
     // Táctil: tercio izquierdo agacharse, resto saltar. Con ratón, clic = saltar.
-    this.input.on('pointerdown', (p: Phaser.Input.Pointer) => {
-      if (this.dead) return;
+    // Los toques sobre botones (p. ej. silencio) no cuentan.
+    this.input.on('pointerdown', (p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
+      if (this.dead || over.length) return;
       if (p.wasTouch && p.x < WIDTH * 0.33) {
         this.touchDuck = true;
       } else {
@@ -127,6 +135,7 @@ export class GameScene extends Phaser.Scene {
     this.speed = Math.min(SPEED.max, this.speed + SPEED.accel * dt);
     const dx = this.speed * dt;
     this.background.scroll(dx);
+    setMusicRate(1 + ((this.speed - SPEED.start) / (SPEED.max - SPEED.start)) * AUDIO.musicMaxRateBoost);
 
     this.updatePlayer(time);
     this.updateObstacles(dx);
@@ -134,6 +143,7 @@ export class GameScene extends Phaser.Scene {
     this.score += dx * SCORE_PER_PX;
     if (this.score >= this.nextMilestone) {
       this.nextMilestone += 100;
+      playSfx(this, 'milestone', 0);
       this.tweens.add({ targets: this.scoreText, alpha: 0.2, duration: 120, yoyo: true, repeat: 2 });
     }
     this.updateScoreText();
@@ -146,6 +156,8 @@ export class GameScene extends Phaser.Scene {
     const duckHeld = this.keys.down.isDown || this.keys.s.isDown || this.touchDuck;
 
     if (onGround) this.lastGroundTime = time;
+    if (onGround && !this.wasOnGround) playSfx(this, 'land');
+    this.wasOnGround = onGround;
 
     // Salto con "coyote time" y "jump buffer": perdona pulsar un poco antes o después.
     const canJump = time - this.lastGroundTime <= PHYSICS.coyoteMs && body.velocity.y >= 0;
@@ -154,6 +166,7 @@ export class GameScene extends Phaser.Scene {
       this.lastJumpPress = -Infinity;
       this.lastGroundTime = -Infinity;
       this.setDucking(false);
+      playSfx(this, `jump_${this.character}`);
     }
     if (!jumpHeld && body.velocity.y < -PHYSICS.jumpCutVelocity) {
       body.setVelocityY(-PHYSICS.jumpCutVelocity);
@@ -178,6 +191,7 @@ export class GameScene extends Phaser.Scene {
     if (ducking === this.ducking) return;
     this.ducking = ducking;
     this.setPlayerHitbox(ducking);
+    if (ducking) playSfx(this, 'duck');
   }
 
   private updateObstacles(dx: number) {
@@ -248,6 +262,10 @@ export class GameScene extends Phaser.Scene {
     const isRecord = this.score > this.highScore;
     if (isRecord) setHighScore(this.score);
 
+    stopMusic();
+    playSfx(this, 'hit', 0);
+    this.time.delayedCall(350, () => playSfx(this, isRecord ? 'record' : 'gameover', 0));
+
     const panel = this.add.container(WIDTH / 2, HEIGHT / 2 - 90).setDepth(30);
     panel.add(this.add.rectangle(0, 0, 560, 250, 0xf7f0e4, 0.94).setStrokeStyle(6, 0x3b2f2f));
     panel.add(this.add.text(0, -75, '¡Ay!', { ...TEXT_STYLE, fontSize: '64px' }).setOrigin(0.5));
@@ -268,7 +286,9 @@ export class GameScene extends Phaser.Scene {
       this.input.keyboard!.once('keydown-SPACE', restart);
       this.input.keyboard!.once('keydown-UP', restart);
       this.input.keyboard!.once('keydown-ESC', () => this.scene.start('menu'));
-      this.input.once('pointerdown', restart);
+      this.input.on('pointerdown', (_p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
+        if (!over.length) restart();
+      });
     });
   }
 }

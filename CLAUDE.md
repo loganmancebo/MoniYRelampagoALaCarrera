@@ -6,10 +6,12 @@ Idioma del proyecto: **español** (textos del juego, comentarios, commits y conv
 
 - Repositorio: https://github.com/JoseMancebo/MoniYRelampagoALaCarrera
 - Tareas pendientes y hoja de ruta: [docs/TAREAS.md](docs/TAREAS.md)
+- Sistema de sonido (qué suena, cómo cambiarlo, cómo poner sonidos definitivos): [docs/SONIDO.md](docs/SONIDO.md)
 
 ## Stack y comandos
 
 - **Phaser 3.90** (física Arcade) + **TypeScript** + **Vite 6**. Node 20.
+- **zzfx 1.4** para los sonidos provisionales (se sintetizan al arrancar; no hay archivos de audio todavía).
 - `npm run dev` — servidor de desarrollo en http://localhost:5173 (también `.claude/launch.json` → "game").
 - `npm run build` — `tsc --noEmit` + build de producción en `dist/` (rutas relativas, `base: './'`, se puede servir desde cualquier carpeta).
 - `npm run assets` — regenera las imágenes de `public/assets/` y `src/generated/assets.ts` a partir de las imágenes originales.
@@ -29,7 +31,27 @@ src/scenes/PreloadScene.ts  Carga assets y crea animaciones (`moni-run`, `relamp
 src/scenes/MenuScene.ts     Selección de personaje.
 src/scenes/GameScene.ts     Partida: jugador, obstáculos, puntuación, game over.
 src/scenes/background.ts    Cielo + suelo en tileSprite con parallax; TEXT_STYLE compartido.
+src/audio/sounds.ts         Definición de efectos (parámetros ZzFX), instrumentos y canciones en texto.
+src/audio/render.ts         Sintetiza efectos y canciones a muestras de audio.
+src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMusicRate, stopMusic, toggleMute.
+src/ui/MuteButton.ts        Botón de silencio dibujado (arriba a la izquierda) + tecla M.
+src/types/zzfx.d.ts         Tipos mínimos de zzfx.
 ```
+
+## Sonido (resumen; detalle en docs/SONIDO.md)
+
+- Todo el audio pasa por el SoundManager de Phaser y se usa **por clave** (`playSfx(scene, 'hit')`).
+- `initAudio()` (en `PreloadScene.create`) sintetiza con ZzFX cada sonido de `SFX`/`SONGS` **que no esté ya
+  en `cache.audio`**. Por eso, para poner un sonido definitivo basta con `this.load.audio('<clave>', [...])`
+  en `PreloadScene.preload()`: tiene prioridad sobre el provisional.
+- Claves: `jump_moni`, `jump_relampago`, `land`, `duck`, `hit`, `gameover`, `record`, `milestone`,
+  `ui_select`, `ui_start`, `music_menu`, `music_game`.
+- Volúmenes y variación de tono en `AUDIO` (config.ts). Silencio guardado en `localStorage` (`moni.muted`).
+- **No leer `scene.sound.mute`** para saber si está silenciado: Phaser lo calcula a partir del gain del nodo
+  de audio, que no se actualiza hasta que el motor de audio procesa (y nunca si el contexto está suspendido).
+  Usar `isMuted()` de `src/audio`, que guarda el estado propio.
+- Los toques/clics sobre botones no cuentan como salto: los manejadores de `pointerdown` de la escena
+  ignoran el evento si hay objetos interactivos debajo (`over.length`). Mantenerlo al añadir botones.
 
 ## Pipeline de imágenes (tools/process-assets.mjs)
 
@@ -75,6 +97,7 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   La de 60 está calculada para que de pie choques y agachado pases: si cambias tamaños de hitbox, revísala.
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
+- **Silencio**: botón arriba a la izquierda o tecla M (menú y partida).
 - Los dos personajes juegan igual por ahora (las habilidades están en TAREAS).
 
 ## Dirección de arte (para generar imágenes nuevas)
@@ -94,7 +117,11 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - `http://localhost:5173/?debug` muestra las hitboxes de Arcade.
 - En desarrollo, `window.game` expone la instancia de Phaser: se puede inspeccionar la escena
   (`game.scene.getScene('game')`), forzar estados o simular teclas con `KeyboardEvent` en `window`.
-- Si el usuario está jugando en el panel del navegador, probar en **otra pestaña** para no interferir.
+- Si el usuario está jugando en el panel del navegador, sus pulsaciones reales afectan a las pruebas
+  (p. ej. ESPACIO en el menú empieza partida). Ojo: las pestañas en segundo plano **congelan el juego**
+  (no hay requestAnimationFrame), así que solo sirven para inspeccionar datos (cache, buffers), no para jugar.
+- El sonido no se puede verificar automáticamente: comprobar que los buffers existen y no están vacíos
+  (`game.cache.audio.get(clave)`) y registrar qué claves suenan envolviendo `game.sound.play`.
 - Comprobar siempre `npx tsc --noEmit` y `npm run build` antes de dar algo por terminado.
 
 ## Convenciones

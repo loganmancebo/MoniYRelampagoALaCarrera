@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { initAudio } from '../audio';
 import { CHARACTERS, FRAME, HEIGHT, WIDTH } from '../config';
 import { ASSET_META } from '../generated/assets';
 
@@ -38,6 +39,7 @@ export class PreloadScene extends Phaser.Scene {
       frameRate: 3,
       repeat: -1,
     });
+    initAudio(this);
     this.scene.start('menu');
   }
 }

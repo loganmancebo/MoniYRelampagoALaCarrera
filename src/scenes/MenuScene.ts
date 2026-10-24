@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { CHAR_SCALE, CHARACTER_NAMES, CHARACTERS, CharacterKey, GROUND_Y, WIDTH } from '../config';
+import { playMusic, playSfx } from '../audio';
 import { getHighScore, load, save } from '../storage';
+import { MuteButton } from '../ui/MuteButton';
 import { Background, TEXT_STYLE } from './background';
 
 export class MenuScene extends Phaser.Scene {
@@ -48,10 +50,13 @@ export class MenuScene extends Phaser.Scene {
     kb.on('keydown-SPACE', () => this.startGame());
     kb.on('keydown-ENTER', () => this.startGame());
 
-    this.select(this.selected);
+    new MuteButton(this, 48, 48);
+    this.select(this.selected, true);
+    playMusic(this, 'music_menu');
   }
 
-  private select(i: number) {
+  private select(i: number, silent = false) {
+    if (!silent && i !== this.selected) playSfx(this, 'ui_select', 0);
     this.selected = i;
     this.sprites.forEach((s, j) => {
       const active = j === i;
@@ -65,6 +70,7 @@ export class MenuScene extends Phaser.Scene {
   private startGame() {
     const character = CHARACTERS[this.selected];
     save('moni.character', character);
+    playSfx(this, 'ui_start', 0);
     this.scene.start('game', { character });
   }
 

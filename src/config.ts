@@ -32,6 +32,13 @@ export const SPEED = {
   accel: 9, // px/s por segundo
 };
 
+export const AUDIO = {
+  sfxVolume: 0.5,
+  musicVolume: 0.3,
+  detune: 80, // variación aleatoria de tono (cents) en cada efecto
+  musicMaxRateBoost: 0.08, // la música va hasta un 8 % más rápida a velocidad máxima
+};
+
 export const SCORE_PER_PX = 0.025;
 export const AIR_OBSTACLES_FROM_SCORE = 250;
 
