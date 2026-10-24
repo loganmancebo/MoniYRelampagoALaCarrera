@@ -3,6 +3,7 @@ import { HEIGHT, WIDTH } from './config';
 import { PreloadScene } from './scenes/PreloadScene';
 import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
+import { PauseScene } from './scenes/PauseScene';
 
 async function start() {
   // Espera a la fuente de Google para que los textos no salgan con la fuente por defecto.
@@ -23,7 +24,7 @@ async function start() {
       arcade: { debug: new URLSearchParams(location.search).has('debug') },
     },
     input: { activePointers: 3 },
-    scene: [PreloadScene, MenuScene, GameScene],
+    scene: [PreloadScene, MenuScene, GameScene, PauseScene],
   });
   if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;
 }

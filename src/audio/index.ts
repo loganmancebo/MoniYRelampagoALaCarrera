@@ -50,6 +50,14 @@ export function setMusicRate(rate: number) {
   music?.setRate(rate);
 }
 
+export function pauseMusic() {
+  if (music?.isPlaying) music.pause();
+}
+
+export function resumeMusic() {
+  if (music?.isPaused) music.resume();
+}
+
 export function stopMusic() {
   music?.stop();
   music?.destroy();

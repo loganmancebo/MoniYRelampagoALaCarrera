@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { playMusic, playSfx, setMusicRate, stopMusic } from '../audio';
+import { pauseMusic, playMusic, playSfx, resumeMusic, setMusicRate, stopMusic } from '../audio';
 import {
   AIR_LEVELS,
   AIR_OBSTACLES_FROM_SCORE,
@@ -22,6 +22,7 @@ import { ASSET_META } from '../generated/assets';
 import { getHighScore, setHighScore } from '../storage';
 import { DashButton } from '../ui/DashButton';
 import { MuteButton } from '../ui/MuteButton';
+import { PauseButton } from '../ui/PauseButton';
 import { Background, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
@@ -51,6 +52,7 @@ export class GameScene extends Phaser.Scene {
   private dashReadyAt = 0;
   private dashReadyNotified = true;
   private dashButton?: DashButton;
+  private muteButton!: MuteButton;
 
   private keys!: Keys;
   private touchJump = false;
@@ -105,10 +107,37 @@ export class GameScene extends Phaser.Scene {
       .setDepth(20);
     this.updateScoreText();
 
-    new MuteButton(this, 48, 48);
+    this.muteButton = new MuteButton(this, 48, 48);
+    new PauseButton(this, 120, 48, () => this.pauseGame());
     if (this.character === 'relampago') this.dashButton = new DashButton(this, WIDTH - 70, HEIGHT - 66, () => this.tryDash());
     this.setupInput();
     playMusic(this, 'music_game');
+
+    // Pausa automática al perder el foco o cambiar de pestaña.
+    this.events.on(Phaser.Scenes.Events.RESUME, this.onResume, this);
+    this.game.events.on(Phaser.Core.Events.BLUR, this.pauseGame, this);
+    this.game.events.on(Phaser.Core.Events.HIDDEN, this.pauseGame, this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+      this.events.off(Phaser.Scenes.Events.RESUME, this.onResume, this);
+      this.game.events.off(Phaser.Core.Events.BLUR, this.pauseGame, this);
+      this.game.events.off(Phaser.Core.Events.HIDDEN, this.pauseGame, this);
+    });
+  }
+
+  private pauseGame() {
+    if (this.dead || !this.scene.isActive()) return;
+    this.scene.pause();
+    this.scene.launch('pause');
+    pauseMusic();
+  }
+
+  private onResume() {
+    // Lo que se pulsó o soltó durante la pausa no debe contar al volver.
+    this.input.keyboard!.resetKeys();
+    this.touchJump = this.touchDuck = false;
+    this.lastJumpPress = -Infinity;
+    this.muteButton.refresh();
+    resumeMusic();
   }
 
   private setupInput() {
@@ -118,6 +147,8 @@ export class GameScene extends Phaser.Scene {
       k.on('down', () => (this.lastJumpPress = this.time.now));
     }
     for (const k of [this.keys.right, this.keys.d]) k.on('down', () => this.tryDash());
+    kb.on('keydown-P', () => this.pauseGame());
+    kb.on('keydown-ESC', () => this.pauseGame()); // tras el choque, ESC vuelve al menú (ver gameOver)
     // Táctil: tercio izquierdo agacharse, resto saltar. Con ratón, clic = saltar.
     // Los toques sobre botones (p. ej. silencio) no cuentan.
     this.input.on('pointerdown', (p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {

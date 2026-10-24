@@ -26,6 +26,11 @@ export class MuteButton {
     this.scene.tweens.add({ targets: this.gfx, scale: { from: 0.85, to: 1 }, duration: 120, ease: 'Back.Out' });
   }
 
+  // Redibuja el icono si el silencio se ha cambiado desde otra escena (p. ej. la pausa).
+  refresh() {
+    this.draw();
+  }
+
   private draw() {
     const g = this.gfx.clear();
     g.fillStyle(PAPER, 0.92).fillCircle(0, 0, RADIUS);

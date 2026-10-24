@@ -30,11 +30,13 @@ src/storage.ts              localStorage con try/catch (récord y último person
 src/scenes/PreloadScene.ts  Carga assets y crea animaciones (`moni-run`, `relampago-run`, `cloud`).
 src/scenes/MenuScene.ts     Selección de personaje.
 src/scenes/GameScene.ts     Partida: jugador, obstáculos, puntuación, game over.
+src/scenes/PauseScene.ts    Panel de pausa que se lanza encima de la partida pausada.
 src/scenes/background.ts    Cielo + suelo en tileSprite con parallax; TEXT_STYLE compartido.
 src/audio/sounds.ts         Definición de efectos (parámetros ZzFX), instrumentos y canciones en texto.
 src/audio/render.ts         Sintetiza efectos y canciones a muestras de audio.
-src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMusicRate, stopMusic, toggleMute.
+src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMusicRate, pause/resumeMusic, stopMusic, toggleMute.
 src/ui/MuteButton.ts        Botón de silencio dibujado (arriba a la izquierda) + tecla M.
+src/ui/PauseButton.ts       Botón de pausa dibujado (junto al de silencio).
 src/ui/DashButton.ts        Botón del dash de Relámpago con indicador de recarga.
 src/types/zzfx.d.ts         Tipos mínimos de zzfx.
 ```
@@ -100,7 +102,11 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   La de 60 está calculada para que de pie choques y agachado pases: si cambias tamaños de hitbox, revísala.
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
-- **Silencio**: botón arriba a la izquierda o tecla M (menú y partida).
+- **Silencio**: botón arriba a la izquierda o tecla M (menú, partida y pausa).
+- **Pausa**: P / ESC o el botón junto al de silencio; también al perder el foco o cambiar de pestaña
+  (eventos `blur`/`hidden` del juego). La partida se pausa con `scene.pause()` y se lanza `PauseScene`
+  encima; al reanudar se reinician las teclas para que lo pulsado durante la pausa no cuente.
+  Tras el choque, ESC vuelve al menú (no pausa).
 - **Dash (solo Relámpago)**: → / D o el botón del rayo (abajo a la derecha, `src/ui/DashButton.ts`, que muestra
   la recarga). Durante el dash el mundo va más rápido y los obstáculos que toca quedan marcados como
   `dashed` (ya no matan aunque siga encima al terminar). Valores en `DASH` (config.ts).
