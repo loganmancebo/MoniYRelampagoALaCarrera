@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { stopMusic } from '../audio';
 import { HEIGHT, WIDTH } from '../config';
 import { MuteButton } from '../ui/MuteButton';
+import { FullscreenButton } from '../ui/FullscreenButton';
 import { TEXT_STYLE } from './background';
 
 const INK = 0x3b2f2f;
@@ -25,6 +26,7 @@ export class PauseScene extends Phaser.Scene {
     panel.add(this.add.text(0, 100, 'P o ESC para seguir', { ...TEXT_STYLE, fontSize: '22px', fontStyle: '500' }).setOrigin(0.5));
 
     new MuteButton(this, 48, 48);
+    new FullscreenButton(this, 192, 48);
 
     const kb = this.input.keyboard!;
     kb.on('keydown-P', () => this.resumeGame());

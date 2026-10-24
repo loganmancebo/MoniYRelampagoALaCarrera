@@ -4,6 +4,7 @@ import { PreloadScene } from './scenes/PreloadScene';
 import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
 import { PauseScene } from './scenes/PauseScene';
+import { autoFullscreenOnFirstTouch } from './fullscreen';
 
 async function start() {
   // Espera a la fuente de Google para que los textos no salgan con la fuente por defecto.
@@ -26,6 +27,7 @@ async function start() {
     input: { activePointers: 3 },
     scene: [PreloadScene, MenuScene, GameScene, PauseScene],
   });
+  autoFullscreenOnFirstTouch();
   if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;
 }
 

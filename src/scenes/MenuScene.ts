@@ -3,6 +3,7 @@ import { CHAR_SCALE, CHARACTER_NAMES, CHARACTERS, CharacterKey, GROUND_Y, WIDTH 
 import { playMusic, playSfx } from '../audio';
 import { getHighScore, load, save } from '../storage';
 import { MuteButton } from '../ui/MuteButton';
+import { FullscreenButton } from '../ui/FullscreenButton';
 import { Background, TEXT_STYLE } from './background';
 
 export class MenuScene extends Phaser.Scene {
@@ -51,6 +52,7 @@ export class MenuScene extends Phaser.Scene {
     kb.on('keydown-ENTER', () => this.startGame());
 
     new MuteButton(this, 48, 48);
+    new FullscreenButton(this, 120, 48);
     this.select(this.selected, true);
     playMusic(this, 'music_menu');
   }

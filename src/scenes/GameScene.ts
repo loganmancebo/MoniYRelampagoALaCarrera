@@ -23,6 +23,7 @@ import { getHighScore, setHighScore } from '../storage';
 import { DashButton } from '../ui/DashButton';
 import { MuteButton } from '../ui/MuteButton';
 import { PauseButton } from '../ui/PauseButton';
+import { FullscreenButton } from '../ui/FullscreenButton';
 import { Background, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
@@ -109,6 +110,7 @@ export class GameScene extends Phaser.Scene {
 
     this.muteButton = new MuteButton(this, 48, 48);
     new PauseButton(this, 120, 48, () => this.pauseGame());
+    new FullscreenButton(this, 192, 48);
     if (this.character === 'relampago') this.dashButton = new DashButton(this, WIDTH - 70, HEIGHT - 66, () => this.tryDash());
     this.setupInput();
     playMusic(this, 'music_game');

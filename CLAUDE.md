@@ -105,6 +105,9 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú, partida y pausa).
+- **Pantalla completa** (`src/fullscreen.ts`, `src/ui/FullscreenButton.ts`): se activa sola con el primer toque
+  (solo una vez por carga) e intenta bloquear en horizontal; botón de esquinas junto a los de silencio/pausa.
+  Solo funciona dentro de un gesto (`touchend`/`pointerup`, no `pointerdown`). En iPhone no existe y el botón no se crea.
 - **Pausa**: P / ESC o el botón junto al de silencio; también al perder el foco o cambiar de pestaña
   (eventos `blur`/`hidden` del juego). La partida se pausa con `scene.pause()` y se lanza `PauseScene`
   encima; al reanudar se reinician las teclas para que lo pulsado durante la pausa no cuente.
