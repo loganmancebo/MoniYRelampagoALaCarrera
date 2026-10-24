@@ -23,9 +23,12 @@ export class MenuScene extends Phaser.Scene {
     this.selected = Math.max(0, CHARACTERS.indexOf(load('moni.character') as CharacterKey));
 
     this.add
-      .text(WIDTH / 2, 120, 'Moni & Relámpago', { ...TEXT_STYLE, fontSize: '84px', color: '#f7f0e4', stroke: '#3b2f2f', strokeThickness: 12 })
+      .text(WIDTH / 2, 95, 'Moni & Relámpago', { ...TEXT_STYLE, fontSize: '84px', color: '#f7f0e4', stroke: '#3b2f2f', strokeThickness: 12 })
       .setOrigin(0.5);
-    this.add.text(WIDTH / 2, 205, 'Elige personaje', { ...TEXT_STYLE, fontSize: '34px' }).setOrigin(0.5);
+    this.add
+      .text(WIDTH / 2, 165, 'a la carrera', { ...TEXT_STYLE, fontSize: '52px', color: '#f7f0e4', stroke: '#3b2f2f', strokeThickness: 10 })
+      .setOrigin(0.5);
+    this.add.text(WIDTH / 2, 228, 'Elige personaje', { ...TEXT_STYLE, fontSize: '34px' }).setOrigin(0.5);
 
     CHARACTERS.forEach((c, i) => {
       const x = WIDTH / 2 + (i === 0 ? -200 : 200);
@@ -42,7 +45,7 @@ export class MenuScene extends Phaser.Scene {
 
     const best = getHighScore();
     this.add
-      .text(WIDTH / 2, 268, `Toca un personaje o usa ← → y ESPACIO${best ? `   ·   Récord: ${best}` : ''}`, { ...TEXT_STYLE, fontSize: '24px', fontStyle: '500' })
+      .text(WIDTH / 2, 280,`Toca un personaje o usa ← → y ESPACIO${best ? `   ·   Récord: ${best}` : ''}`, { ...TEXT_STYLE, fontSize: '24px', fontStyle: '500' })
       .setOrigin(0.5);
 
     const kb = this.input.keyboard!;

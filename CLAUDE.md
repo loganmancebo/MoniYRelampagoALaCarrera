@@ -1,4 +1,4 @@
-# Moni & Relámpago — Endless runner para navegador
+# Moni & Relámpago a la carrera — Endless runner para navegador
 
 Juego tipo "dinosaurio de Chrome" con dos personajes propios: **Moni** (conejito morado, barriga rosa) y
 **Relámpago** (bolita coral con gorro verde y un rayo amarillo). Se juega en el navegador, en escritorio y móvil.

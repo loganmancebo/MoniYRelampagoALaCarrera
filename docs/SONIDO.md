@@ -1,4 +1,4 @@
-# Sonido — Moni & Relámpago
+# Sonido — Moni & Relámpago a la carrera
 
 Estado actual: **todos los sonidos son provisionales**, generados por código con
 [ZzFX](https://killedbyapixel.github.io/ZzFX/) (librería `zzfx`, MIT). No hay ningún archivo de audio:

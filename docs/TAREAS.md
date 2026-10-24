@@ -1,4 +1,4 @@
-# Tareas pendientes — Moni & Relámpago
+# Tareas pendientes — Moni & Relámpago a la carrera
 
 Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 
