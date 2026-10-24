@@ -4,7 +4,8 @@ Juego tipo "dinosaurio de Chrome" con dos personajes propios: **Moni** (conejito
 **Relámpago** (bolita coral con gorro verde y un rayo amarillo). Se juega en el navegador, en escritorio y móvil.
 Idioma del proyecto: **español** (textos del juego, comentarios, commits y conversación).
 
-- Repositorio: https://github.com/JoseMancebo/MoniYRelampagoALaCarrera
+- Repositorio: https://github.com/loganmancebo/MoniYRelampagoALaCarrera
+- Juego publicado (GitHub Pages): https://loganmancebo.github.io/MoniYRelampagoALaCarrera/
 - Tareas pendientes y hoja de ruta: [docs/TAREAS.md](docs/TAREAS.md)
 - Sistema de sonido (qué suena, cómo cambiarlo, cómo poner sonidos definitivos): [docs/SONIDO.md](docs/SONIDO.md)
 
@@ -14,6 +15,7 @@ Idioma del proyecto: **español** (textos del juego, comentarios, commits y conv
 - **zzfx 1.4** para los sonidos provisionales (se sintetizan al arrancar; no hay archivos de audio todavía).
 - `npm run dev` — servidor de desarrollo en http://localhost:5173 (también `.claude/launch.json` → "game").
 - `npm run build` — `tsc --noEmit` + build de producción en `dist/` (rutas relativas, `base: './'`, se puede servir desde cualquier carpeta).
+- **Publicación**: `.github/workflows/deploy.yml` compila y publica en GitHub Pages en cada push a `main`.
 - `npm run assets` — regenera las imágenes de `public/assets/` y `src/generated/assets.ts` a partir de las imágenes originales.
 - No hay tests automáticos; la verificación se hace jugando (ver "Cómo probar").
 

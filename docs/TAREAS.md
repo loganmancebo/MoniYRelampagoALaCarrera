@@ -84,7 +84,9 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] Mostrar las zonas táctiles (agacharse / saltar) en la primera partida.
 - [ ] Incluir la fuente Fredoka en el proyecto (ahora viene de Google Fonts y sin conexión se usa otra).
 - [ ] **PWA**: manifest, icono (`icon_512.png`) y service worker para jugar sin conexión.
-- [ ] Publicar en GitHub Pages (con GitHub Actions) o itch.io.
+- [x] Publicar en GitHub Pages con GitHub Actions (`.github/workflows/deploy.yml`):
+      https://loganmancebo.github.io/MoniYRelampagoALaCarrera/
+- [ ] Opcional: publicar también en itch.io.
 - [ ] Título, descripción e imagen para compartir en redes (Open Graph).
 
 ## Arte pendiente (por bloques)
