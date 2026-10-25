@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { CHAR_SCALE, CHARACTER_NAMES, CHARACTERS, CharacterKey, GROUND_Y, WIDTH } from '../config';
+import { CHAR_SCALE, CHARACTER_NAMES, CHARACTERS, CharacterKey, GROUND_Y, HEIGHT, WIDTH } from '../config';
 import { playMusic, playSfx } from '../audio';
 import { getHighScore, load, save } from '../storage';
 import { MuteButton } from '../ui/MuteButton';
@@ -45,8 +45,14 @@ export class MenuScene extends Phaser.Scene {
 
     const best = getHighScore();
     this.add
-      .text(WIDTH / 2, 280,`Toca un personaje o usa ← → y ESPACIO${best ? `   ·   Récord: ${best}` : ''}`, { ...TEXT_STYLE, fontSize: '24px', fontStyle: '500' })
+      .text(WIDTH / 2, 280, `Toca un personaje o usa ← → y ESPACIO${best ? `   ·   Récord: ${best}` : ''}`, { ...TEXT_STYLE, fontSize: '24px', fontStyle: '500' })
       .setOrigin(0.5);
+
+    // Créditos sobre la franja de tierra, bajo el suelo.
+    this.add
+      .text(WIDTH / 2, HEIGHT - 30, 'Un juego de Logan Mancebo y Jose Mancebo', { ...TEXT_STYLE, fontSize: '20px', fontStyle: '500', color: '#f7f0e4', stroke: '#3b2f2f', strokeThickness: 6 })
+      .setOrigin(0.5)
+      .setDepth(6);
 
     const kb = this.input.keyboard!;
     kb.on('keydown-LEFT', () => this.select(0));
