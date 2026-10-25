@@ -59,6 +59,13 @@ export const COUNTDOWN = {
   goMs: 550, // el "¡Ya!" se desvanece mientras ya se juega
 };
 
+export const GAME_OVER = {
+  inputDelayMs: 450, // espera antes de aceptar reintentar, para no reiniciar sin querer al estar saltando
+  recordDelayMs: 350, // la etiqueta de récord sale con el sonido `record`
+  recordSparks: 18,
+  buttonSize: 96,
+};
+
 export const SPEED = {
   start: 430,
   max: 1100,

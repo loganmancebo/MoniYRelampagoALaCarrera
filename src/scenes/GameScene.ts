@@ -11,6 +11,7 @@ import {
   DOUBLE_JUMP,
   FRAME,
   FX,
+  GAME_OVER,
   GROUND_Y,
   HEIGHT,
   OBSTACLES,
@@ -26,6 +27,7 @@ import { DashButton } from '../ui/DashButton';
 import { MuteButton } from '../ui/MuteButton';
 import { PauseButton } from '../ui/PauseButton';
 import { FullscreenButton } from '../ui/FullscreenButton';
+import { GameOverPanel } from '../ui/GameOverPanel';
 import { Background, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
@@ -534,6 +536,7 @@ export class GameScene extends Phaser.Scene {
     this.dead = true;
     this.physics.pause();
     this.tweens.killAll();
+    this.countdownText?.destroy(); // su tween de salida ya no se completará
     this.player.setScale(CHAR_SCALE).clearTint();
     this.player.anims.stop();
     this.player.setFrame(FRAME.hit);
@@ -544,28 +547,18 @@ export class GameScene extends Phaser.Scene {
 
     stopMusic();
     playSfx(this, 'hit', 0);
-    this.time.delayedCall(350, () => playSfx(this, isRecord ? 'record' : 'gameover', 0));
+    this.time.delayedCall(GAME_OVER.recordDelayMs, () => playSfx(this, isRecord ? 'record' : 'gameover', 0));
 
-    const panel = this.add.container(WIDTH / 2, HEIGHT / 2 - 90).setDepth(30);
-    panel.add(this.add.rectangle(0, 0, 560, 250, 0xf7f0e4, 0.94).setStrokeStyle(6, 0x3b2f2f));
-    panel.add(this.add.text(0, -75, '¡Ay!', { ...TEXT_STYLE, fontSize: '64px' }).setOrigin(0.5));
-    panel.add(
-      this.add
-        .text(0, -5, isRecord ? `¡Nuevo récord! ${Math.floor(this.score)}` : `Puntos: ${Math.floor(this.score)}`, { ...TEXT_STYLE, fontSize: '34px', color: isRecord ? '#b8860b' : '#3b2f2f' })
-        .setOrigin(0.5),
-    );
-    panel.add(
-      this.add
-        .text(0, 70, 'ESPACIO o toca para reintentar\nESC para cambiar de personaje', { ...TEXT_STYLE, fontSize: '22px', fontStyle: '500', align: 'center' })
-        .setOrigin(0.5),
-    );
+    const restart = () => this.scene.restart({ character: this.character });
+    const toMenu = () => this.scene.start('menu');
+    new GameOverPanel(this, { score: this.score, highScore: this.highScore, isRecord, onRestart: restart, onMenu: toMenu });
 
     // Pequeña espera para no reiniciar sin querer al estar pulsando saltar.
-    this.time.delayedCall(450, () => {
-      const restart = () => this.scene.restart({ character: this.character });
+    // Tocar fuera de los botones también reintenta.
+    this.time.delayedCall(GAME_OVER.inputDelayMs, () => {
       this.input.keyboard!.once('keydown-SPACE', restart);
       this.input.keyboard!.once('keydown-UP', restart);
-      this.input.keyboard!.once('keydown-ESC', () => this.scene.start('menu'));
+      this.input.keyboard!.once('keydown-ESC', toMenu);
       this.input.on('pointerdown', (_p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
         if (!over.length) restart();
       });

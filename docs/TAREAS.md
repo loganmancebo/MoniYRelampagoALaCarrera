@@ -77,7 +77,8 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] *Squash & stretch* del personaje al saltar y aterrizar.
 - [x] Pequeña cuenta atrás o "¡Ya!" al empezar la partida (también al reintentar).
 - [ ] Animación de agachado con 2 frames (ahora es un frame fijo).
-- [ ] Pantalla de game over más bonita: botones dibujados (`btn_restart`, `btn_menu`) y récord destacado.
+- [x] Pantalla de game over más bonita: botones dibujados (`btn_restart`, `btn_menu`) y récord destacado.
+      Texturas provisionales en `src/ui/buttonTextures.ts` hasta tener el arte.
 - [ ] Logo dibujado para el menú (`logo.png`) en lugar del texto.
 
 ## Fase 5 · Móvil y publicación

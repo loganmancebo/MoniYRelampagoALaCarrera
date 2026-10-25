@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { initAudio } from '../audio';
 import { CHARACTERS, FRAME, HEIGHT, WIDTH } from '../config';
 import { ASSET_META } from '../generated/assets';
+import { createButtonTextures } from '../ui/buttonTextures';
 import { createFxTextures } from './fx';
 
 export class PreloadScene extends Phaser.Scene {
@@ -41,6 +42,7 @@ export class PreloadScene extends Phaser.Scene {
       repeat: -1,
     });
     createFxTextures(this);
+    createButtonTextures(this);
     initAudio(this);
     this.scene.start('menu');
   }

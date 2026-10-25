@@ -41,6 +41,8 @@ src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMus
 src/ui/MuteButton.ts        Botón de silencio dibujado (arriba a la izquierda) + tecla M.
 src/ui/PauseButton.ts       Botón de pausa dibujado (junto al de silencio).
 src/ui/DashButton.ts        Botón del dash de Relámpago con indicador de recarga.
+src/ui/GameOverPanel.ts     Panel de fin de partida: puntuación, récord y botones `btn_restart` / `btn_menu`.
+src/ui/buttonTextures.ts    Texturas provisionales de `btn_restart` y `btn_menu` si no hay imagen cargada.
 src/types/zzfx.d.ts         Tipos mínimos de zzfx.
 ```
 
@@ -117,7 +119,11 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   Mientras dura, la física, la animación del jugador y las partículas están congeladas, `update` no hace nada
   y no se puede hacer dash; la recarga del dash se retrasa lo que dure. Suena `ui_select` en cada número y `ui_start` en el «¡Ya!».
   El jugador empieza con el cuerpo justo en el suelo y `blocked.down` a true: si no, el primer paso de física cuenta como aterrizaje.
-- **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
+- **Game over**: frame de choque, sacudida de cámara y panel (`GameOverPanel`) con la puntuación, el récord
+  (etiqueta "¡Nuevo récord!" con chispas si se supera) y los botones "Otra vez" y "Menú". ESPACIO/↑ o tocar fuera
+  de los botones reintenta, ESC vuelve al menú. Todo se activa tras `GAME_OVER.inputDelayMs` (config.ts).
+  Para el arte definitivo de los botones basta `this.load.image('btn_restart', ...)` en PreloadScene.
+  Al probarlo forzando `gameOver()` con una puntuación alta se guarda un récord falso: restaurar `moni.highscore`.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú, partida y pausa).
 - **Pantalla completa** (`src/fullscreen.ts`, `src/ui/FullscreenButton.ts`): se activa sola con el primer toque
   (solo una vez por carga) e intenta bloquear en horizontal; botón de esquinas junto a los de silencio/pausa.
