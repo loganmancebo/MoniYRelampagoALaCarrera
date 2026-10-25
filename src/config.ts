@@ -27,6 +27,24 @@ export const PARALLAX = {
   hillsNearBottom: 690,
 };
 
+// Ciclo día/noche por puntuación: cada `everyPoints` cambia de día a noche o al revés, con un fundido.
+// La noche se hace tiñendo cada capa (multiplica el color); el jugador no se tiñe para que se vea bien.
+export const DAY_NIGHT = {
+  everyPoints: 700,
+  transitionPoints: 120,
+  tint: {
+    sky: 0x48558a,
+    hillsFar: 0x5a6694,
+    hillsNear: 0x6b76a2,
+    ground: 0x7a82aa,
+    obstacles: 0xa4a9c8, // más claros que el fondo para que se distingan
+  },
+  scoreColor: { day: 0x3b2f2f, night: 0xf7f0e4 },
+  stars: 36, // en la franja de cielo sobre las colinas
+  starsBottom: 380,
+  moon: { x: 930, y: 150, radius: 42, rise: 40 }, // `rise`: px que sube al hacerse de noche
+};
+
 export const PHYSICS = {
   gravity: 2600,
   fastFallGravity: 4200, // gravedad extra al pulsar abajo en el aire

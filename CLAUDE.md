@@ -33,8 +33,9 @@ src/scenes/PreloadScene.ts  Carga assets y crea animaciones (`moni-run`, `relamp
 src/scenes/MenuScene.ts     Selección de personaje.
 src/scenes/GameScene.ts     Partida: jugador, obstáculos, puntuación, game over.
 src/scenes/PauseScene.ts    Panel de pausa que se lanza encima de la partida pausada.
-src/scenes/background.ts    Cielo, colinas lejanas/cercanas y suelo en tileSprite con parallax (`PARALLAX`); TEXT_STYLE compartido.
-src/scenes/fx.ts            Texturas provisionales de partículas (`fx_dust`, `fx_spark`) si no hay imagen cargada.
+src/scenes/background.ts    Cielo, colinas lejanas/cercanas y suelo en tileSprite con parallax (`PARALLAX`), estrellas y luna
+                            del ciclo día/noche (`setNight`, `nightAmount`); TEXT_STYLE compartido.
+src/scenes/fx.ts            Texturas provisionales (`fx_dust`, `fx_spark`, `fx_star`, `moon`) si no hay imagen cargada.
 src/audio/sounds.ts         Definición de efectos (parámetros ZzFX), instrumentos y canciones en texto.
 src/audio/render.ts         Sintetiza efectos y canciones a muestras de audio.
 src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMusicRate, pause/resumeMusic, stopMusic, toggleMute.
@@ -118,6 +119,11 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   y menos que el doble (~380 px). Moni lo pasa con el salto doble y Relámpago con el dash; a Relámpago solo le
   sale si el dash estará cargado al llegar (`canSpawnTall`, `DASH.readyMarginMs`). Deja un hueco extra detrás
   (`extraGap`) para que Moni aterrice. Si cambias la física del salto o la hitbox, revisa estas alturas.
+- **Ciclo día/noche** (`DAY_NIGHT` en config.ts): cada 700 puntos cambia de día a noche o al revés, con un fundido de
+  120 puntos. La noche tiñe cada capa del fondo y los obstáculos (más claros que el fondo para que se distingan) y
+  saca estrellas y luna; el jugador no se tiñe (el dash usa su tinte). El marcador pasa a claro a mitad del fundido.
+  Va por puntuación, así que se congela con la pausa y la cuenta atrás. Para el arte definitivo basta
+  `this.load.image('moon', ...)` / `'fx_star'` en PreloadScene.
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Cuenta atrás** (`COUNTDOWN` en config.ts): 3, 2, 1, «¡Ya!» al empezar, al reintentar y al volver de la pausa.
   Mientras dura, la física, la animación del jugador y las partículas están congeladas, `update` no hace nada

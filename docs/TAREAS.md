@@ -60,7 +60,8 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
       tocón + nube, valla + abeja…), definidos en `config.ts`.
 - [x] **Parallax** con colinas lejanas y cercanas (arte del bloque 2: `hills_far`, `hills_near`).
 - [ ] Nubes de fondo sueltas que se muevan a distinta velocidad (`clouds.png`).
-- [ ] **Ciclo día/noche** cada ~700 puntos (tintado de cámara o arte nocturno opcional).
+- [x] **Ciclo día/noche** cada 700 puntos: tinte por capa, estrellas y luna (`DAY_NIGHT` en config.ts).
+      Arte nocturno opcional: `fx_star` y `moon` definitivos (ahora se dibujan en `src/scenes/fx.ts`).
 - [ ] Obstáculos móviles para más adelante: **caracol** que avanza hacia el jugador, **erizo** rodando.
 - [ ] Revisar la curva de dificultad jugando de verdad: velocidad máxima, aceleración y huecos.
 - [ ] Rayos coleccionables (`collectible_bolt`) que den puntos extra.

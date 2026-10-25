@@ -8,6 +8,7 @@ import {
   CharacterKey,
   COUNTDOWN,
   DASH,
+  DAY_NIGHT,
   DOUBLE_JUMP,
   FRAME,
   FX,
@@ -28,7 +29,7 @@ import { MuteButton } from '../ui/MuteButton';
 import { PauseButton } from '../ui/PauseButton';
 import { FullscreenButton } from '../ui/FullscreenButton';
 import { GameOverPanel } from '../ui/GameOverPanel';
-import { Background, TEXT_STYLE } from './background';
+import { Background, lerpColor, nightAmount, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
 type Keys = Record<'space' | 'up' | 'w' | 'down' | 's' | 'right' | 'd', Phaser.Input.Keyboard.Key>;
@@ -79,6 +80,8 @@ export class GameScene extends Phaser.Scene {
   private frozenSince = 0;
   private frozenWhileDashing = false;
   private countdownText?: Phaser.GameObjects.Text;
+  private night = 0;
+  private obstacleTint = 0xffffff;
 
   private keys!: Keys;
   private touchJump = false;
@@ -105,6 +108,8 @@ export class GameScene extends Phaser.Scene {
     this.dashButton = undefined;
     this.touchJump = this.touchDuck = false;
     this.counting = false;
+    this.night = 0;
+    this.obstacleTint = 0xffffff;
   }
 
   create() {
@@ -296,6 +301,20 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: this.scoreText, alpha: 0.2, duration: 120, yoyo: true, repeat: 2 });
     }
     this.updateScoreText();
+    this.updateDayNight(time);
+  }
+
+  private updateDayNight(time: number) {
+    const night = nightAmount(this.score);
+    this.background.setNight(night, time);
+    if (night === this.night) return;
+    this.night = night;
+    this.obstacleTint = lerpColor(0xffffff, DAY_NIGHT.tint.obstacles, night);
+    for (const o of this.obstacles.getChildren() as Phaser.Physics.Arcade.Image[]) o.setTint(this.obstacleTint);
+    // El marcador cambia de golpe a mitad del fundido: mezclado quedaría gris sobre gris.
+    const color = night < 0.5 ? DAY_NIGHT.scoreColor.day : DAY_NIGHT.scoreColor.night;
+    const css = Phaser.Display.Color.IntegerToColor(color).rgba;
+    if (this.scoreText.style.color !== css) this.scoreText.setColor(css);
   }
 
   private updatePlayer(time: number) {
@@ -486,7 +505,7 @@ export class GameScene extends Phaser.Scene {
     const sink = def.sink ?? 0;
     const y = def.air ? GROUND_Y - Phaser.Utils.Array.GetRandom(AIR_LEVELS) : GROUND_Y + 4 + sink;
     const o = this.obstacles.create(SPAWN_X, y, `obstacle_${def.key}`) as Phaser.Physics.Arcade.Sprite;
-    o.setOrigin(0.5, 1).setScale(scale).setDepth(def.air ? 12 : 8);
+    o.setOrigin(0.5, 1).setScale(scale).setDepth(def.air ? 12 : 8).setTint(this.obstacleTint);
 
     const body = o.body as Body;
     const bw = tw * def.hitbox[0];
