@@ -9,6 +9,7 @@ import {
   DASH,
   DOUBLE_JUMP,
   FRAME,
+  FX,
   GROUND_Y,
   HEIGHT,
   OBSTACLES,
@@ -32,12 +33,27 @@ type Keys = Record<'space' | 'up' | 'w' | 'down' | 's' | 'right' | 'd', Phaser.I
 const PLAYER_X = 220;
 const SPAWN_X = WIDTH + 150; // los obstáculos aparecen fuera de la pantalla, por la derecha
 
+// Zona de emisión: un punto al azar en un rectángulo relativo al punto de emisión.
+function randomInRect(x: number, y: number, w: number, h: number): Phaser.Types.GameObjects.Particles.EmitZoneData {
+  return {
+    type: 'random',
+    source: {
+      getRandomPoint: (p) => {
+        p.x = x + Math.random() * w;
+        p.y = y + Math.random() * h;
+      },
+    },
+  };
+}
+
 export class GameScene extends Phaser.Scene {
   private character!: CharacterKey;
   private background!: Background;
   private player!: Phaser.Physics.Arcade.Sprite;
   private obstacles!: Phaser.Physics.Arcade.Group;
   private scoreText!: Phaser.GameObjects.Text;
+  private dust!: Phaser.GameObjects.Particles.ParticleEmitter;
+  private sparks!: Phaser.GameObjects.Particles.ParticleEmitter;
 
   private speed = SPEED.start;
   private score = 0;
@@ -102,6 +118,8 @@ export class GameScene extends Phaser.Scene {
       if (this.isDashing()) obstacle.setData('dashed', true);
       return !obstacle.getData('dashed');
     });
+
+    this.createParticles();
 
     this.scoreText = this.add
       .text(WIDTH - 32, 28, '', { ...TEXT_STYLE, fontSize: '34px' })
@@ -213,7 +231,10 @@ export class GameScene extends Phaser.Scene {
       this.lastGroundTime = time;
       this.canDoubleJump = this.character === 'moni';
     }
-    if (onGround && !this.wasOnGround) playSfx(this, 'land');
+    if (onGround && !this.wasOnGround) {
+      playSfx(this, 'land');
+      this.dust.explode(FX.dustCount, this.player.x, GROUND_Y);
+    }
     this.wasOnGround = onGround;
 
     // Salto con "coyote time" y "jump buffer": perdona pulsar un poco antes o después.
@@ -276,6 +297,37 @@ export class GameScene extends Phaser.Scene {
     this.tweens.add({ targets: puff, scaleX: 2.2, scaleY: 1.6, alpha: 0, duration: 280, onComplete: () => puff.destroy() });
   }
 
+  private createParticles() {
+    // Polvo en los pies; se queda atrás con el suelo, que se mueve hacia la izquierda.
+    this.dust = this.add
+      .particles(0, 0, 'fx_dust', {
+        emitting: false,
+        emitZone: randomInRect(-40, -8, 80, 8),
+        lifespan: { min: 280, max: 480 },
+        speedX: { onEmit: () => -this.worldSpeed() * FX.dustDrift + Phaser.Math.Between(-70, 70) },
+        speedY: { min: -130, max: -30 },
+        scale: { start: 0.7, end: 1.5 },
+        alpha: { start: 0.9, end: 0 },
+      })
+      .setDepth(9);
+
+    // Chispas que salen del cuerpo de Relámpago y se quedan atrás durante el dash.
+    this.sparks = this.add
+      .particles(0, 0, 'fx_spark', {
+        emitting: false,
+        frequency: FX.sparkEveryMs,
+        emitZone: randomInRect(-45, -100, 60, 90),
+        lifespan: { min: 220, max: 380 },
+        speedX: { min: -520, max: -220 },
+        speedY: { min: -140, max: 140 },
+        rotate: { min: 0, max: 360 },
+        scale: { start: 1.3, end: 0.3 },
+        alpha: { start: 1, end: 0 },
+      })
+      .setDepth(11);
+    this.sparks.startFollow(this.player);
+  }
+
   private isDashing() {
     return this.time.now < this.dashUntil;
   }
@@ -294,6 +346,7 @@ export class GameScene extends Phaser.Scene {
 
     // Provisional hasta tener el arte `relampago_dash`: tinte, adelantarse un poco y estelas.
     this.player.setTint(DASH.tint);
+    this.sparks.start(0, DASH.durationMs);
     this.tweens.add({ targets: this.player, x: PLAYER_X + DASH.forwardPx, duration: DASH.durationMs / 2, yoyo: true, ease: 'Sine.Out' });
     this.time.addEvent({
       delay: DASH.trailEveryMs,

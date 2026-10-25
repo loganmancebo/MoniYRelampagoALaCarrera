@@ -45,6 +45,13 @@ export const DASH = {
   readyMarginMs: 400,
 };
 
+// Partículas (texturas provisionales en scenes/fx.ts hasta tener el arte `fx_dust` y `fx_spark`).
+export const FX = {
+  dustCount: 10, // motas de polvo al aterrizar
+  dustDrift: 0.5, // el polvo se queda atrás a esta fracción de la velocidad del mundo
+  sparkEveryMs: 22, // una chispa cada tantos ms durante el dash
+};
+
 export const SPEED = {
   start: 430,
   max: 1100,

@@ -34,6 +34,7 @@ src/scenes/MenuScene.ts     Selección de personaje.
 src/scenes/GameScene.ts     Partida: jugador, obstáculos, puntuación, game over.
 src/scenes/PauseScene.ts    Panel de pausa que se lanza encima de la partida pausada.
 src/scenes/background.ts    Cielo + suelo en tileSprite con parallax; TEXT_STYLE compartido.
+src/scenes/fx.ts            Texturas provisionales de partículas (`fx_dust`, `fx_spark`) si no hay imagen cargada.
 src/audio/sounds.ts         Definición de efectos (parámetros ZzFX), instrumentos y canciones en texto.
 src/audio/render.ts         Sintetiza efectos y canciones a muestras de audio.
 src/audio/index.ts          API de sonido: initAudio, playSfx, playMusic, setMusicRate, pause/resumeMusic, stopMusic, toggleMute.
@@ -98,6 +99,8 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - Resolución lógica 1280x720, `GROUND_Y = 620`, jugador fijo en x=220, escala de personaje 0.55 (~120 px).
 - **Salto**: ESPACIO / ↑ / W / clic / toque en los 2/3 derechos. Salto variable (soltar corta la subida),
   *coyote time* 90 ms y *jump buffer* 130 ms.
+- **Polvo al aterrizar** (`fx_dust`): emisor en `GameScene.createParticles`, valores en `FX` (config.ts).
+  Para el arte definitivo basta `this.load.image('fx_dust', ...)` en PreloadScene (igual que con el sonido).
 - **Salto doble (solo Moni)**: pulsar saltar otra vez en el aire, una vez por salto (`DOUBLE_JUMP` en config.ts).
   Si faltan menos de `jumpBufferMs` para aterrizar, la pulsación se guarda para el salto normal.
 - **Agacharse**: ↓ / S / toque en el tercio izquierdo. En el aire acelera la caída.
@@ -120,7 +123,7 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   encima; al reanudar se reinician las teclas para que lo pulsado durante la pausa no cuente.
   Tras el choque, ESC vuelve al menú (no pausa).
 - **Dash (solo Relámpago)**: → / D o el botón del rayo (abajo a la derecha, `src/ui/DashButton.ts`, que muestra
-  la recarga). Durante el dash el mundo va más rápido y los obstáculos que toca quedan marcados como
+  la recarga) y suelta chispas (`fx_spark`). Durante el dash el mundo va más rápido y los obstáculos que toca quedan marcados como
   `dashed` (ya no matan aunque siga encima al terminar). Valores en `DASH` (config.ts).
 
 ## Dirección de arte (para generar imágenes nuevas)

@@ -72,7 +72,8 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [x] **Pausa**: tecla P / Esc y botón en pantalla (junto al de silencio). Se pausa también al perder el foco
       o cambiar de pestaña. Panel con "Seguir" y "Menú"; la música se pausa y se reanuda.
 - [ ] Opcional: cuenta atrás corta (3, 2, 1) al reanudar tras la pausa.
-- [ ] Partículas: polvo al aterrizar (`fx_dust`), chispas en el dash (`fx_spark`).
+- [x] Partículas: polvo al aterrizar (`fx_dust`), chispas en el dash (`fx_spark`). Texturas provisionales
+      dibujadas en `src/scenes/fx.ts` hasta tener el arte.
 - [ ] *Squash & stretch* del personaje al saltar y aterrizar.
 - [ ] Pequeña cuenta atrás o "¡Ya!" al empezar la partida.
 - [ ] Animación de agachado con 2 frames (ahora es un frame fijo).

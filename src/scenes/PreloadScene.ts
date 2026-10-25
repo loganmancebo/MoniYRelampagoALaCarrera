@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { initAudio } from '../audio';
 import { CHARACTERS, FRAME, HEIGHT, WIDTH } from '../config';
 import { ASSET_META } from '../generated/assets';
+import { createFxTextures } from './fx';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -39,6 +40,7 @@ export class PreloadScene extends Phaser.Scene {
       frameRate: 3,
       repeat: -1,
     });
+    createFxTextures(this);
     initAudio(this);
     this.scene.start('menu');
   }
