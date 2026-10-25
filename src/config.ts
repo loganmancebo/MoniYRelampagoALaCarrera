@@ -41,6 +41,8 @@ export const DASH = {
   cooldownMs: 5000, // recarga, contada desde que termina el dash
   tint: 0xffe680,
   trailEveryMs: 40, // estelas (provisional hasta tener el arte `relampago_dash`)
+  // Los obstáculos `tall` solo salen si el dash estará cargado este tiempo antes de llegar al jugador.
+  readyMarginMs: 400,
 };
 
 export const SPEED = {
@@ -68,6 +70,10 @@ export interface ObstacleDef {
   air?: boolean;
   anim?: string;
   sink?: number; // px que se hunde en la tierra (la hitbox no se mueve, sigue sobre el suelo)
+  minScore?: number; // no sale hasta esta puntuación
+  // Más alto que el salto normal: Moni lo pasa con el salto doble y Relámpago con el dash.
+  tall?: boolean;
+  extraGap?: number; // hueco extra hasta el siguiente obstáculo, en segundos de recorrido (× velocidad)
   weight: number;
 }
 
@@ -80,6 +86,8 @@ export const OBSTACLES: ObstacleDef[] = [
   { key: 'stump', height: 96, hitbox: [0.65, 0.85], sink: 16, weight: 2 },
   { key: 'puddle', height: 52, hitbox: [0.7, 0.4], sink: 14, weight: 2 },
   { key: 'stones', height: 48, hitbox: [0.85, 0.8], weight: 2 },
+  // Hitbox de 266 px: el salto normal llega a ~212 px y el doble a ~380 px.
+  { key: 'tree', height: 280, hitbox: [0.55, 0.95], tall: true, minScore: 400, extraGap: 0.5, weight: 2 },
   { key: 'cloud1', height: 92, hitbox: [0.7, 0.55], air: true, anim: 'cloud', weight: 2 },
   { key: 'bee1', height: 68, hitbox: [0.6, 0.6], air: true, weight: 2 },
 ];

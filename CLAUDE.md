@@ -80,6 +80,7 @@ Archivos de entrada que espera (nombres exactos):
 | `Obstaculos_sprite_sheet_1200x896_2.jpg` | Cuadrícula 4x3 |
 | `Ground_2064x512.jpg` | Tira horizontal, superficie recta |
 | `Sky_1774x887.png` | Opaca, sin magenta |
+| `Tree_887x1774.png` | Obstáculo suelto (`SINGLE_OBSTACLES`), se reduce a 600 px de alto |
 
 **Orden de frames de los personajes** (`FRAME` en config.ts):
 `0-3` carrera · `4` subiendo · `5` cayendo · `6` choque (ojos en X + estrellas) · `7` agachado.
@@ -87,6 +88,8 @@ Archivos de entrada que espera (nombres exactos):
 **Orden de la hoja de obstáculos**:
 fila 1 `mushroom, carrot, rock, fence` · fila 2 `rod, stump, puddle, stones` · fila 3 `cloud1, cloud2, bee1, bee2`.
 `bee2` no se usa (no es consistente con `bee1`); la abeja se anima con tweens.
+Los obstáculos de imagen suelta (`SINGLE_OBSTACLES` en el script) se reducen a ~2× su alto en pantalla:
+Phaser no usa mipmaps y una reducción grande en el juego adelgaza y rompe la línea.
 
 Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar visualmente los PNG generados.
 
@@ -102,6 +105,10 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
 - **Velocidad** 430 → 1100 px/s (+9 px/s²). Hueco entre obstáculos aleatorio entre 0,75 y 1,6 × velocidad.
 - **Voladores** (nube, abeja) desde 250 puntos, a 3 alturas (`AIR_LEVELS`): 10 (saltar), 60 (agacharse), 150 (pasar por debajo).
   La de 60 está calculada para que de pie choques y agachado pases: si cambias tamaños de hitbox, revísala.
+- **Árbol alto** (`tree`, desde 400 puntos, `tall: true`): hitbox de 266 px, más que el salto normal (~212 px)
+  y menos que el doble (~380 px). Moni lo pasa con el salto doble y Relámpago con el dash; a Relámpago solo le
+  sale si el dash estará cargado al llegar (`canSpawnTall`, `DASH.readyMarginMs`). Deja un hueco extra detrás
+  (`extraGap`) para que Moni aterrice. Si cambias la física del salto o la hitbox, revisa estas alturas.
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú, partida y pausa).

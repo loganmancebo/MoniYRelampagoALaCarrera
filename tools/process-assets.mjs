@@ -121,12 +121,24 @@ const OBSTACLE_NAMES = [
   'cloud1', 'cloud2', 'bee1', 'bee2',
 ];
 
+// Obstáculos que vienen en una imagen suelta. Se reducen a `height` px (≈2× su alto en pantalla, como
+// los de la hoja) porque Phaser no usa mipmaps y una reducción grande en el juego deja la línea rota.
+const SINGLE_OBSTACLES = {
+  tree: { file: 'Tree_887x1774.png', height: 600 },
+};
+
 async function obstacles(file) {
   const frames = cells(chromaKey(await load(file)), 4, 3);
   const meta = {};
   for (let i = 0; i < frames.length; i++) {
     await raw(frames[i]).png().toFile(`${OUT}/obstacle_${OBSTACLE_NAMES[i]}.png`);
     meta[OBSTACLE_NAMES[i]] = [frames[i].width, frames[i].height];
+  }
+  for (const [name, { file: single, height }] of Object.entries(SINGLE_OBSTACLES)) {
+    const [frame] = cells(chromaKey(await load(single)), 1, 1);
+    const out = await resized(frame, height / frame.height);
+    await raw(out).png().toFile(`${OUT}/obstacle_${name}.png`);
+    meta[name] = [out.width, out.height];
   }
   return meta;
 }

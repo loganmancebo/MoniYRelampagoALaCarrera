@@ -30,6 +30,7 @@ type Body = Phaser.Physics.Arcade.Body;
 type Keys = Record<'space' | 'up' | 'w' | 'down' | 's' | 'right' | 'd', Phaser.Input.Keyboard.Key>;
 
 const PLAYER_X = 220;
+const SPAWN_X = WIDTH + 150; // los obstáculos aparecen fuera de la pantalla, por la derecha
 
 export class GameScene extends Phaser.Scene {
   private character!: CharacterKey;
@@ -344,14 +345,17 @@ export class GameScene extends Phaser.Scene {
 
   private spawnObstacle() {
     const allowAir = this.score >= AIR_OBSTACLES_FROM_SCORE;
-    const pool = OBSTACLES.filter((d) => allowAir || !d.air);
+    const tallOk = this.canSpawnTall();
+    const pool = OBSTACLES.filter(
+      (d) => (allowAir || !d.air) && this.score >= (d.minScore ?? 0) && (tallOk || !d.tall),
+    );
     const def = this.weightedPick(pool);
 
     const [tw, th] = ASSET_META.obstacles[def.key];
     const scale = def.height / th;
     const sink = def.sink ?? 0;
     const y = def.air ? GROUND_Y - Phaser.Utils.Array.GetRandom(AIR_LEVELS) : GROUND_Y + 4 + sink;
-    const o = this.obstacles.create(WIDTH + 150, y, `obstacle_${def.key}`) as Phaser.Physics.Arcade.Sprite;
+    const o = this.obstacles.create(SPAWN_X, y, `obstacle_${def.key}`) as Phaser.Physics.Arcade.Sprite;
     o.setOrigin(0.5, 1).setScale(scale).setDepth(def.air ? 12 : 8);
 
     const body = o.body as Body;
@@ -364,7 +368,14 @@ export class GameScene extends Phaser.Scene {
 
     // Hueco hasta el siguiente: crece con la velocidad para que siempre dé tiempo a reaccionar.
     const gap = Phaser.Math.Between(this.speed * 0.75, this.speed * 1.6);
-    this.distanceToSpawn = gap + tw * scale;
+    this.distanceToSpawn = gap + tw * scale + this.speed * (def.extraGap ?? 0);
+  }
+
+  // Relámpago solo puede pasar los obstáculos altos con el dash: tiene que estar cargado al llegar.
+  private canSpawnTall() {
+    if (this.character !== 'relampago') return true;
+    const travelMs = ((SPAWN_X - PLAYER_X) / this.speed) * 1000;
+    return this.dashReadyAt <= this.time.now + travelMs - DASH.readyMarginMs;
   }
 
   private decorate(o: Phaser.Physics.Arcade.Sprite, def: ObstacleDef) {

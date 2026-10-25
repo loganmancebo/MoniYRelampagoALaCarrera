@@ -124,6 +124,10 @@ export const ASSET_META = {
     "bee2": [
       207,
       181
+    ],
+    "tree": [
+      130,
+      600
     ]
   },
   "ground": {

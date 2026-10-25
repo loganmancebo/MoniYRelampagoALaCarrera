@@ -41,6 +41,8 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [x] **Moni: salto doble**, pulsando saltar otra vez en el aire (`DOUBLE_JUMP` en config.ts, sonido `doublejump`).
       Efecto provisional: estirón del sprite y anillo de aire bajo los pies. Si se pulsa justo antes de
       aterrizar, cuenta como salto normal (jump buffer) y no gasta el doble.
+- [x] **Árbol alto** (`tree`) para que el salto doble sea necesario: Moni lo pasa con el doble salto y
+      Relámpago con el dash (solo le sale con el dash cargado). Desde 400 puntos.
 - [ ] Moni: usar el arte `moni_doublejump` (3 frames, giro con las orejas como hélice) cuando exista.
 - [x] **Relámpago: dash eléctrico** con → / D o el botón del rayo (abajo a la derecha, que también muestra
       la recarga). Durante 0,38 s el mundo va 2,2× más rápido y atraviesa lo que toque; recarga de 5 s
