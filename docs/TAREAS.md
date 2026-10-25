@@ -71,11 +71,11 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [x] Botón de silencio (guardado en localStorage)
 - [x] **Pausa**: tecla P / Esc y botón en pantalla (junto al de silencio). Se pausa también al perder el foco
       o cambiar de pestaña. Panel con "Seguir" y "Menú"; la música se pausa y se reanuda.
-- [ ] Opcional: cuenta atrás corta (3, 2, 1) al reanudar tras la pausa.
+- [x] Cuenta atrás corta (3, 2, 1, «¡Ya!») al reanudar tras la pausa.
 - [x] Partículas: polvo al aterrizar (`fx_dust`), chispas en el dash (`fx_spark`). Texturas provisionales
       dibujadas en `src/scenes/fx.ts` hasta tener el arte.
 - [ ] *Squash & stretch* del personaje al saltar y aterrizar.
-- [ ] Pequeña cuenta atrás o "¡Ya!" al empezar la partida.
+- [x] Pequeña cuenta atrás o "¡Ya!" al empezar la partida (también al reintentar).
 - [ ] Animación de agachado con 2 frames (ahora es un frame fijo).
 - [ ] Pantalla de game over más bonita: botones dibujados (`btn_restart`, `btn_menu`) y récord destacado.
 - [ ] Logo dibujado para el menú (`logo.png`) en lugar del texto.

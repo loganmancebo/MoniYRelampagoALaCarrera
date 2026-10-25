@@ -6,6 +6,7 @@ import {
   AUDIO,
   CHAR_SCALE,
   CharacterKey,
+  COUNTDOWN,
   DASH,
   DOUBLE_JUMP,
   FRAME,
@@ -71,6 +72,11 @@ export class GameScene extends Phaser.Scene {
   private dashReadyNotified = true;
   private dashButton?: DashButton;
   private muteButton!: MuteButton;
+  private counting = false;
+  private countdown?: Phaser.Time.TimerEvent;
+  private frozenSince = 0;
+  private frozenWhileDashing = false;
+  private countdownText?: Phaser.GameObjects.Text;
 
   private keys!: Keys;
   private touchJump = false;
@@ -96,6 +102,7 @@ export class GameScene extends Phaser.Scene {
     this.dashReadyNotified = true;
     this.dashButton = undefined;
     this.touchJump = this.touchDuck = false;
+    this.counting = false;
   }
 
   create() {
@@ -109,6 +116,13 @@ export class GameScene extends Phaser.Scene {
     this.player = this.physics.add.sprite(PLAYER_X, GROUND_Y, this.character, 0).setOrigin(0.5, 1).setScale(CHAR_SCALE).setDepth(10);
     this.player.play(`${this.character}-run`);
     this.setPlayerHitbox(false);
+    // La física empieza congelada (cuenta atrás): apoyar ya el cuerpo justo en el suelo,
+    // o el primer paso tras el "¡Ya!" contaría como aterrizaje.
+    const playerBody = this.player.body as Body;
+    playerBody.updateFromGameObject();
+    this.player.y += GROUND_Y - playerBody.bottom;
+    playerBody.updateFromGameObject();
+    playerBody.blocked.down = true;
     this.physics.add.collider(this.player, floor);
 
     this.obstacles = this.physics.add.group({ allowGravity: false, immovable: true });
@@ -133,6 +147,7 @@ export class GameScene extends Phaser.Scene {
     if (this.character === 'relampago') this.dashButton = new DashButton(this, WIDTH - 70, HEIGHT - 66, () => this.tryDash());
     this.setupInput();
     playMusic(this, 'music_game');
+    this.startCountdown();
 
     // Pausa automática al perder el foco o cambiar de pestaña.
     this.events.on(Phaser.Scenes.Events.RESUME, this.onResume, this);
@@ -159,6 +174,66 @@ export class GameScene extends Phaser.Scene {
     this.lastJumpPress = -Infinity;
     this.muteButton.refresh();
     resumeMusic();
+    this.startCountdown();
+  }
+
+  // Congela el mundo y muestra 3, 2, 1, "¡Ya!". Se reinicia si se pausa a mitad.
+  private startCountdown() {
+    // Si se pausa a mitad de la cuenta, el mundo sigue congelado desde la primera.
+    if (!this.counting) {
+      this.frozenSince = this.time.now;
+      this.frozenWhileDashing = this.isDashing();
+    }
+    this.counting = true;
+    this.physics.pause();
+    this.player.anims.pause();
+    this.dust.pause();
+    this.sparks.pause();
+    this.countdown?.remove();
+
+    let n = COUNTDOWN.from;
+    const show = () => {
+      if (n > 0) {
+        this.showCountdownText(String(n), COUNTDOWN.stepMs, false);
+        playSfx(this, 'ui_select', 0);
+        n--;
+        return;
+      }
+      this.countdown?.remove();
+      this.counting = false;
+      this.physics.resume();
+      this.player.anims.resume();
+      this.dust.resume();
+      this.sparks.resume();
+      // El dash y su recarga no avanzan mientras el mundo está congelado.
+      const frozen = this.time.now - this.frozenSince;
+      if (this.frozenWhileDashing) this.dashUntil += frozen;
+      if (this.dashReadyAt > this.frozenSince) this.dashReadyAt += frozen;
+      this.showCountdownText('¡Ya!', COUNTDOWN.goMs, true);
+      playSfx(this, 'ui_start', 0);
+    };
+    show();
+    this.countdown = this.time.addEvent({ delay: COUNTDOWN.stepMs, repeat: COUNTDOWN.from - 1, callback: show });
+  }
+
+  private showCountdownText(label: string, duration: number, isGo: boolean) {
+    this.countdownText?.destroy();
+    const text = this.add
+      .text(WIDTH / 2, HEIGHT / 2 - 60, label, { ...TEXT_STYLE, fontSize: isGo ? '120px' : '140px', stroke: '#f7f0e4', strokeThickness: 12 })
+      .setOrigin(0.5)
+      .setDepth(30)
+      .setScale(1.6)
+      .setAlpha(0);
+    this.countdownText = text;
+    this.tweens.add({ targets: text, scale: 1, alpha: 1, duration: 160, ease: 'Back.Out' });
+    this.tweens.add({
+      targets: text,
+      alpha: 0,
+      scale: isGo ? 1.3 : 0.8,
+      delay: duration - 180,
+      duration: 180,
+      onComplete: () => text.destroy(),
+    });
   }
 
   private setupInput() {
@@ -200,7 +275,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number) {
-    if (this.dead) return;
+    if (this.dead || this.counting) return;
     const dt = Math.min(delta, 50) / 1000;
 
     this.speed = Math.min(SPEED.max, this.speed + SPEED.accel * dt);
@@ -338,7 +413,7 @@ export class GameScene extends Phaser.Scene {
 
   private tryDash() {
     const now = this.time.now;
-    if (this.character !== 'relampago' || this.dead || now < this.dashReadyAt) return;
+    if (this.character !== 'relampago' || this.dead || this.counting || now < this.dashReadyAt) return;
     this.dashUntil = now + DASH.durationMs;
     this.dashReadyAt = this.dashUntil + DASH.cooldownMs;
     this.dashReadyNotified = false;

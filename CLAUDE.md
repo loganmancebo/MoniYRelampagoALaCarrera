@@ -113,6 +113,10 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   sale si el dash estará cargado al llegar (`canSpawnTall`, `DASH.readyMarginMs`). Deja un hueco extra detrás
   (`extraGap`) para que Moni aterrice. Si cambias la física del salto o la hitbox, revisa estas alturas.
 - **Puntuación**: 0,025 puntos por px recorrido; parpadeo cada 100; récord en `localStorage` (`moni.highscore`).
+- **Cuenta atrás** (`COUNTDOWN` en config.ts): 3, 2, 1, «¡Ya!» al empezar, al reintentar y al volver de la pausa.
+  Mientras dura, la física, la animación del jugador y las partículas están congeladas, `update` no hace nada
+  y no se puede hacer dash; la recarga del dash se retrasa lo que dure. Suena `ui_select` en cada número y `ui_start` en el «¡Ya!».
+  El jugador empieza con el cuerpo justo en el suelo y `blocked.down` a true: si no, el primer paso de física cuenta como aterrizaje.
 - **Game over**: frame de choque, sacudida de cámara, panel "¡Ay!"; ESPACIO/toque reintenta, ESC vuelve al menú.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú, partida y pausa).
 - **Pantalla completa** (`src/fullscreen.ts`, `src/ui/FullscreenButton.ts`): se activa sola con el primer toque
@@ -120,7 +124,7 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   Solo funciona dentro de un gesto (`touchend`/`pointerup`, no `pointerdown`). En iPhone no existe y el botón no se crea.
 - **Pausa**: P / ESC o el botón junto al de silencio; también al perder el foco o cambiar de pestaña
   (eventos `blur`/`hidden` del juego). La partida se pausa con `scene.pause()` y se lanza `PauseScene`
-  encima; al reanudar se reinician las teclas para que lo pulsado durante la pausa no cuente.
+  encima; al reanudar se reinician las teclas para que lo pulsado durante la pausa no cuente y hay cuenta atrás.
   Tras el choque, ESC vuelve al menú (no pausa).
 - **Dash (solo Relámpago)**: → / D o el botón del rayo (abajo a la derecha, `src/ui/DashButton.ts`, que muestra
   la recarga) y suelta chispas (`fx_spark`). Durante el dash el mundo va más rápido y los obstáculos que toca quedan marcados como

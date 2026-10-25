@@ -52,6 +52,13 @@ export const FX = {
   sparkEveryMs: 22, // una chispa cada tantos ms durante el dash
 };
 
+// Cuenta atrás al empezar la partida y al volver de la pausa: el mundo se congela hasta el "¡Ya!".
+export const COUNTDOWN = {
+  from: 3,
+  stepMs: 450, // tiempo de cada número
+  goMs: 550, // el "¡Ya!" se desvanece mientras ya se juega
+};
+
 export const SPEED = {
   start: 430,
   max: 1100,
