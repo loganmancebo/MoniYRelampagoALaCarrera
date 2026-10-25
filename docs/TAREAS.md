@@ -56,10 +56,12 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 
 ## Fase 3 · Mundo y dificultad
 
-- [ ] **Patrones de obstáculos**: combinaciones a partir de X puntos (dos obstáculos bajos seguidos,
-      tocón + nube, valla + abeja…), definidos en `config.ts`.
+- [x] **Patrones de obstáculos**: combinaciones desde 300 puntos (pareja de bajos de un salto, dos y tres bajos
+      seguidos, tocón + nube, valla + abeja, nube + roca, abejas a dos alturas), en `PATTERNS` (config.ts).
+- [ ] Ajustar jugando la frecuencia de los patrones (`PATTERN_CHANCE`) y sus huecos.
 - [x] **Parallax** con colinas lejanas y cercanas (arte del bloque 2: `hills_far`, `hills_near`).
-- [ ] Nubes de fondo sueltas que se muevan a distinta velocidad (`clouds.png`).
+- [x] ~~Nubes de fondo sueltas que se muevan a distinta velocidad (`clouds.png`).~~ Descartada: se quedan
+      las nubes que ya trae `sky.png`.
 - [x] **Ciclo día/noche** cada 700 puntos: tinte por capa, estrellas y luna (`DAY_NIGHT` en config.ts).
       Arte nocturno opcional: `fx_star` y `moon` definitivos (ahora se dibujan en `src/scenes/fx.ts`).
 - [ ] Obstáculos móviles para más adelante: **caracol** que avanza hacia el jugador, **erizo** rodando.
@@ -101,7 +103,7 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] `moni_idle` / `relampago_idle` (2 frames) para el menú
 - [ ] `moni_doublejump` (3 frames) y `relampago_dash` (3 frames)
 - [x] `hills_far.png`, `hills_near.png` (tileables)
-- [ ] `clouds.png`
+- [x] ~~`clouds.png`~~ (descartada, se usan las nubes de `sky.png`)
 - [ ] `collectible_bolt.png` (4 frames)
 - [ ] Opcional: repetir la abeja con 2 frames consistentes (ahora se usa solo `bee1` con tweens)
 

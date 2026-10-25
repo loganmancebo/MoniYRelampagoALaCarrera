@@ -17,6 +17,9 @@ import {
   HEIGHT,
   OBSTACLES,
   ObstacleDef,
+  ObstacleKey,
+  PATTERN_CHANCE,
+  PATTERNS,
   PHYSICS,
   SCORE_PER_PX,
   SPEED,
@@ -36,6 +39,34 @@ type Keys = Record<'space' | 'up' | 'w' | 'down' | 's' | 'right' | 'd', Phaser.I
 
 const PLAYER_X = 220;
 const SPAWN_X = WIDTH + 150; // los obstáculos aparecen fuera de la pantalla, por la derecha
+
+// Obstáculo pendiente de salir (los de un patrón se eligen todos a la vez).
+interface QueuedObstacle {
+  def: ObstacleDef;
+  level: number; // altura sobre el suelo si es volador
+  gap: number; // hueco desde el anterior, en segundos de recorrido
+}
+
+function obstacleDef(key: ObstacleKey): ObstacleDef {
+  const def = OBSTACLES.find((d) => d.key === key);
+  if (!def) throw new Error(`Obstáculo sin definir en OBSTACLES: ${key}`);
+  return def;
+}
+
+// Ancho del dibujo en pantalla.
+function obstacleWidth(def: ObstacleDef) {
+  const [tw, th] = ASSET_META.obstacles[def.key];
+  return (tw * def.height) / th;
+}
+
+function weightedPick<T extends { weight: number }>(pool: T[]): T {
+  let r = Math.random() * pool.reduce((s, d) => s + d.weight, 0);
+  for (const d of pool) {
+    r -= d.weight;
+    if (r <= 0) return d;
+  }
+  return pool[pool.length - 1];
+}
 
 // Zona de emisión: un punto al azar en un rectángulo relativo al punto de emisión.
 function randomInRect(x: number, y: number, w: number, h: number): Phaser.Types.GameObjects.Particles.EmitZoneData {
@@ -64,6 +95,7 @@ export class GameScene extends Phaser.Scene {
   private highScore = 0;
   private nextMilestone = 100;
   private distanceToSpawn = 0;
+  private queue: QueuedObstacle[] = [];
   private dead = false;
   private ducking = false;
   private wasOnGround = true;
@@ -98,6 +130,7 @@ export class GameScene extends Phaser.Scene {
     this.highScore = getHighScore();
     this.nextMilestone = 100;
     this.distanceToSpawn = 600;
+    this.queue = [];
     this.dead = false;
     this.ducking = false;
     this.wasOnGround = true;
@@ -493,17 +526,46 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnObstacle() {
+    if (!this.queue.length) this.queue = this.nextObstacles();
+    const { def, level } = this.queue.shift()!;
+    this.createObstacle(def, level);
+
+    const next = this.queue[0];
+    if (next) {
+      // Dentro de un patrón: hueco fijo de borde a borde (los obstáculos se colocan por el centro).
+      this.distanceToSpawn = obstacleWidth(def) / 2 + next.gap * this.speed + obstacleWidth(next.def) / 2;
+    } else {
+      // Hueco hasta el siguiente: crece con la velocidad para que siempre dé tiempo a reaccionar.
+      const gap = Phaser.Math.Between(this.speed * 0.75, this.speed * 1.6);
+      this.distanceToSpawn = gap + obstacleWidth(def) + this.speed * (def.extraGap ?? 0);
+    }
+  }
+
+  // Un patrón entero (con probabilidad PATTERN_CHANCE, si hay alguno disponible) o un obstáculo suelto.
+  private nextObstacles(): QueuedObstacle[] {
+    const airLevel = (i?: number) => AIR_LEVELS[i ?? Phaser.Math.Between(0, AIR_LEVELS.length - 1)];
+    const patterns = PATTERNS.filter((p) => this.score >= p.minScore);
+    if (patterns.length && Math.random() < PATTERN_CHANCE) {
+      return weightedPick(patterns).steps.map((step) => ({
+        def: obstacleDef(Phaser.Utils.Array.GetRandom(step.keys)),
+        level: airLevel(step.level),
+        gap: step.gap ?? 0,
+      }));
+    }
+
     const allowAir = this.score >= AIR_OBSTACLES_FROM_SCORE;
     const tallOk = this.canSpawnTall();
     const pool = OBSTACLES.filter(
       (d) => (allowAir || !d.air) && this.score >= (d.minScore ?? 0) && (tallOk || !d.tall),
     );
-    const def = this.weightedPick(pool);
+    return [{ def: weightedPick(pool), level: airLevel(), gap: 0 }];
+  }
 
+  private createObstacle(def: ObstacleDef, level: number) {
     const [tw, th] = ASSET_META.obstacles[def.key];
     const scale = def.height / th;
     const sink = def.sink ?? 0;
-    const y = def.air ? GROUND_Y - Phaser.Utils.Array.GetRandom(AIR_LEVELS) : GROUND_Y + 4 + sink;
+    const y = def.air ? GROUND_Y - level : GROUND_Y + 4 + sink;
     const o = this.obstacles.create(SPAWN_X, y, `obstacle_${def.key}`) as Phaser.Physics.Arcade.Sprite;
     o.setOrigin(0.5, 1).setScale(scale).setDepth(def.air ? 12 : 8).setTint(this.obstacleTint);
 
@@ -514,10 +576,6 @@ export class GameScene extends Phaser.Scene {
     body.setOffset((tw - bw) / 2, def.air ? (th - bh) / 2 : th - bh - sink / scale);
 
     this.decorate(o, def);
-
-    // Hueco hasta el siguiente: crece con la velocidad para que siempre dé tiempo a reaccionar.
-    const gap = Phaser.Math.Between(this.speed * 0.75, this.speed * 1.6);
-    this.distanceToSpawn = gap + tw * scale + this.speed * (def.extraGap ?? 0);
   }
 
   // Relámpago solo puede pasar los obstáculos altos con el dash: tiene que estar cargado al llegar.
@@ -534,15 +592,6 @@ export class GameScene extends Phaser.Scene {
       this.tweens.add({ targets: o, scaleY: o.scaleY * 0.9, duration: 90, yoyo: true, repeat: -1 });
       this.tweens.add({ targets: o, angle: { from: -6, to: 6 }, duration: 300, yoyo: true, repeat: -1 });
     }
-  }
-
-  private weightedPick(pool: ObstacleDef[]): ObstacleDef {
-    let r = Math.random() * pool.reduce((s, d) => s + d.weight, 0);
-    for (const d of pool) {
-      r -= d.weight;
-      if (r <= 0) return d;
-    }
-    return pool[pool.length - 1];
   }
 
   private updateScoreText() {

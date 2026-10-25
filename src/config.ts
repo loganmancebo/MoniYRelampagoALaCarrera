@@ -147,3 +147,37 @@ export const AIR_LEVELS = [
   60, // medio: hay que agacharse
   150, // alto: se puede pasar por debajo
 ];
+
+// Patrones: grupos de obstáculos seguidos con huecos fijos. Cada vez que toca sacar obstáculo, si hay
+// algún patrón disponible por puntuación, sale uno con probabilidad `PATTERN_CHANCE`.
+export interface PatternStep {
+  keys: ObstacleKey[]; // uno al azar
+  level?: number; // voladores: índice de AIR_LEVELS (si falta, al azar)
+  // Hueco desde el obstáculo anterior, de borde a borde del dibujo, en segundos de recorrido (× velocidad).
+  // Así el ritmo es el mismo a cualquier velocidad (el salto siempre dura ~0,8 s).
+  gap?: number;
+}
+
+export interface ObstaclePattern {
+  name: string;
+  minScore: number;
+  weight: number;
+  steps: PatternStep[];
+}
+
+export const PATTERN_CHANCE = 0.3;
+
+// Salto completo: ~0,7 s por encima de los obstáculos bajos. Con 0,08 s entre dos pequeños se pasan
+// los dos de un salto (a 300 puntos ya se va a ~630 px/s); con 0,8 s o más hay que saltar dos veces.
+const SMALL: ObstacleKey[] = ['rock', 'puddle', 'mushroom'];
+const LOW: ObstacleKey[] = ['rock', 'puddle', 'mushroom', 'stones', 'fence', 'carrot'];
+
+export const PATTERNS: ObstaclePattern[] = [
+  { name: 'pareja', minScore: 300, weight: 3, steps: [{ keys: SMALL }, { keys: SMALL, gap: 0.08 }] },
+  { name: 'dos bajos', minScore: 300, weight: 2, steps: [{ keys: LOW }, { keys: LOW, gap: 0.8 }] },
+  { name: 'tocón + nube', minScore: 350, weight: 2, steps: [{ keys: ['stump'] }, { keys: ['cloud1'], level: 1, gap: 0.9 }] },
+  { name: 'valla + abeja', minScore: 350, weight: 2, steps: [{ keys: ['fence'] }, { keys: ['bee1'], level: 0, gap: 0.85 }] },
+  { name: 'nube + roca', minScore: 450, weight: 2, steps: [{ keys: ['cloud1'], level: 1 }, { keys: ['rock', 'stones'], gap: 0.7 }] },
+  { name: 'abejas', minScore: 600, weight: 1, steps: [{ keys: ['bee1'], level: 0 }, { keys: ['bee1'], level: 1, gap: 0.9 }] },
+  { name: 'tres bajos', minScore: 900, weight: 1, steps: [{ keys: LOW }, { keys: LOW, gap: 0.8 }, { keys: LOW, gap: 0.8 }] },
+];

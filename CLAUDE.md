@@ -119,6 +119,10 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   y menos que el doble (~380 px). Moni lo pasa con el salto doble y Relámpago con el dash; a Relámpago solo le
   sale si el dash estará cargado al llegar (`canSpawnTall`, `DASH.readyMarginMs`). Deja un hueco extra detrás
   (`extraGap`) para que Moni aterrice. Si cambias la física del salto o la hitbox, revisa estas alturas.
+- **Patrones** (`PATTERNS` en config.ts): grupos de obstáculos con huecos fijos (pareja de bajos que se pasa de un
+  salto, tocón + nube, valla + abeja…), cada uno desde su `minScore`. Al tocar obstáculo, sale un patrón con
+  probabilidad `PATTERN_CHANCE`. Los huecos van de borde a borde en segundos de recorrido (× velocidad), así el
+  ritmo no cambia con la velocidad. No usar obstáculos `tall` en patrones (no pasan por `canSpawnTall`).
 - **Ciclo día/noche** (`DAY_NIGHT` en config.ts): cada 700 puntos cambia de día a noche o al revés, con un fundido de
   120 puntos. La noche tiñe cada capa del fondo y los obstáculos (más claros que el fondo para que se distingan) y
   saca estrellas y luna; el jugador no se tiñe (el dash usa su tinte). El marcador pasa a claro a mitad del fundido.
