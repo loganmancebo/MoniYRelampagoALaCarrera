@@ -127,10 +127,34 @@ const SINGLE_OBSTACLES = {
   tree: { file: 'Tree_887x1774.png', height: 600 },
 };
 
+// Obstáculos cuyo verde se cambia de tono para que se distingan de las colinas (tono en grados).
+const RECOLOR_GREEN = {
+  mushroom: { hue: 6, saturation: 1.7 }, // sombrero rojo
+};
+
+// Cambia el tono de los píxeles verdes manteniendo la luminosidad (y con ella el sombreado y la textura).
+function recolorGreen(img, { hue, saturation }) {
+  const d = img.data;
+  for (let i = 0; i < d.length; i += 4) {
+    const r = d[i] / 255, g = d[i + 1] / 255, b = d[i + 2] / 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b), l = (max + min) / 2, c = max - min;
+    if (c < 0.08 || max !== g) continue;
+    const h = 60 * ((b - r) / c + 2);
+    if (h < 55 || h > 150) continue;
+    const s = Math.min(1, (c / (1 - Math.abs(2 * l - 1))) * saturation);
+    const k = (n) => (n + hue / 30) % 12, a = s * Math.min(l, 1 - l);
+    const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1));
+    d[i] = Math.round(f(0) * 255); d[i + 1] = Math.round(f(8) * 255); d[i + 2] = Math.round(f(4) * 255);
+  }
+  return img;
+}
+
 async function obstacles(file) {
   const frames = cells(chromaKey(await load(file)), 4, 3);
   const meta = {};
   for (let i = 0; i < frames.length; i++) {
+    const recolor = RECOLOR_GREEN[OBSTACLE_NAMES[i]];
+    if (recolor) recolorGreen(frames[i], recolor);
     await raw(frames[i]).png().toFile(`${OUT}/obstacle_${OBSTACLE_NAMES[i]}.png`);
     meta[OBSTACLE_NAMES[i]] = [frames[i].width, frames[i].height];
   }

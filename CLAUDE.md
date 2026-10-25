@@ -72,7 +72,8 @@ El script:
 3. **Personajes**: escala para que el frame de carrera mida 220 px, frames del mismo tamaño en una tira
    horizontal, centrados en X y **con los pies abajo** (2 px de margen).
 4. **Obstáculos**: un PNG recortado por obstáculo (`obstacle_<nombre>.png`) a resolución original;
-   el tamaño en pantalla se fija en `config.ts`.
+   el tamaño en pantalla se fija en `config.ts`. Los de `RECOLOR_GREEN` cambian su verde de tono para que no
+   se confundan con las colinas (la seta sale con el sombrero rojo).
 5. **Suelo y cielo**: fundido del final con el principio (alpha premultiplicado) para repetirse sin costura.
    El suelo se escala a 150 px de tierra bajo la superficie y se detecta `surfaceY` (fila del contorno negro).
 6. **Colinas** (`HILLS` en el script): chroma key, fundido de bordes, se recortan las filas vacías de arriba y se
