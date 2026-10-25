@@ -58,7 +58,7 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 
 - [ ] **Patrones de obstáculos**: combinaciones a partir de X puntos (dos obstáculos bajos seguidos,
       tocón + nube, valla + abeja…), definidos en `config.ts`.
-- [ ] **Parallax** con colinas lejanas y cercanas (arte del bloque 2: `hills_far`, `hills_near`).
+- [x] **Parallax** con colinas lejanas y cercanas (arte del bloque 2: `hills_far`, `hills_near`).
 - [ ] Nubes de fondo sueltas que se muevan a distinta velocidad (`clouds.png`).
 - [ ] **Ciclo día/noche** cada ~700 puntos (tintado de cámara o arte nocturno opcional).
 - [ ] Obstáculos móviles para más adelante: **caracol** que avanza hacia el jugador, **erizo** rodando.
@@ -99,7 +99,8 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] `moni_duck` / `relampago_duck` (2 frames), si se quiere animar el agachado
 - [ ] `moni_idle` / `relampago_idle` (2 frames) para el menú
 - [ ] `moni_doublejump` (3 frames) y `relampago_dash` (3 frames)
-- [ ] `hills_far.png`, `hills_near.png` (tileables), `clouds.png`
+- [x] `hills_far.png`, `hills_near.png` (tileables)
+- [ ] `clouds.png`
 - [ ] `collectible_bolt.png` (4 frames)
 - [ ] Opcional: repetir la abeja con 2 frames consistentes (ahora se usa solo `bee1` con tweens)
 

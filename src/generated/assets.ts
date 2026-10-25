@@ -138,5 +138,13 @@ export const ASSET_META = {
   "sky": {
     "width": 1614,
     "height": 887
+  },
+  "hills_far": {
+    "width": 1856,
+    "height": 260
+  },
+  "hills_near": {
+    "width": 1138,
+    "height": 190
   }
 } as const;

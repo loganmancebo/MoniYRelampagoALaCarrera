@@ -33,7 +33,7 @@ src/scenes/PreloadScene.ts  Carga assets y crea animaciones (`moni-run`, `relamp
 src/scenes/MenuScene.ts     Selección de personaje.
 src/scenes/GameScene.ts     Partida: jugador, obstáculos, puntuación, game over.
 src/scenes/PauseScene.ts    Panel de pausa que se lanza encima de la partida pausada.
-src/scenes/background.ts    Cielo + suelo en tileSprite con parallax; TEXT_STYLE compartido.
+src/scenes/background.ts    Cielo, colinas lejanas/cercanas y suelo en tileSprite con parallax (`PARALLAX`); TEXT_STYLE compartido.
 src/scenes/fx.ts            Texturas provisionales de partículas (`fx_dust`, `fx_spark`) si no hay imagen cargada.
 src/audio/sounds.ts         Definición de efectos (parámetros ZzFX), instrumentos y canciones en texto.
 src/audio/render.ts         Sintetiza efectos y canciones a muestras de audio.
@@ -75,6 +75,8 @@ El script:
    el tamaño en pantalla se fija en `config.ts`.
 5. **Suelo y cielo**: fundido del final con el principio (alpha premultiplicado) para repetirse sin costura.
    El suelo se escala a 150 px de tierra bajo la superficie y se detecta `surfaceY` (fila del contorno negro).
+6. **Colinas** (`HILLS` en el script): chroma key, fundido de bordes, se recortan las filas vacías de arriba y se
+   exportan ya al alto que tienen en pantalla. Posición y velocidad de cada capa en `PARALLAX` (config.ts).
 
 Archivos de entrada que espera (nombres exactos):
 | Archivo | Formato |
@@ -84,6 +86,7 @@ Archivos de entrada que espera (nombres exactos):
 | `Ground_2064x512.jpg` | Tira horizontal, superficie recta |
 | `Sky_1774x887.png` | Opaca, sin magenta |
 | `Tree_887x1774.png` | Obstáculo suelto (`SINGLE_OBSTACLES`), se reduce a 600 px de alto |
+| `distant_hills_seamless_2048x512.png`, `hills_near_2172x724.png` | Tiras horizontales repetibles con fondo magenta (`hills_far`, `hills_near`) |
 
 **Orden de frames de los personajes** (`FRAME` en config.ts):
 `0-3` carrera · `4` subiendo · `5` cayendo · `6` choque (ojos en X + estrellas) · `7` agachado.

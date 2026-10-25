@@ -16,6 +16,8 @@ export class PreloadScene extends Phaser.Scene {
     this.load.on('progress', (p: number) => (bar.width = 400 * p));
 
     this.load.image('sky', 'assets/sky.png');
+    this.load.image('hills_far', 'assets/hills_far.png');
+    this.load.image('hills_near', 'assets/hills_near.png');
     this.load.image('ground', 'assets/ground.png');
     for (const c of CHARACTERS) {
       const { frameWidth, frameHeight } = ASSET_META[c];

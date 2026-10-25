@@ -186,6 +186,27 @@ async function ground(file) {
   return { width: out.width, height: out.height, surfaceY: Math.round(surface * scale) };
 }
 
+// Colinas del parallax: se recortan las filas vacías de arriba y se exportan ya al alto que tendrán en
+// pantalla (`height`), para que Phaser no tenga que reducirlas (no usa mipmaps).
+const HILLS = {
+  hills_far: { file: 'distant_hills_seamless_2048x512.png', height: 260 },
+  hills_near: { file: 'hills_near_2172x724.png', height: 190 },
+};
+
+async function hills(name, { file, height }) {
+  const img = makeSeamless(chromaKey(await load(file)), 64);
+  let top = 0;
+  while (top < img.height && !rowHasPixels(img, top)) top++;
+  const out = await resized(crop(img, 0, top, img.width, img.height - top), height / (img.height - top));
+  await raw(out).png().toFile(`${OUT}/${name}.png`);
+  return { width: out.width, height: out.height };
+}
+
+function rowHasPixels(img, y) {
+  for (let x = 0; x < img.width; x++) if (img.data[(y * img.width + x) * 4 + 3] > 40) return true;
+  return false;
+}
+
 async function sky(file) {
   const img = makeSeamless(await load(file), 160);
   await raw(img).png().toFile(`${OUT}/sky.png`);
@@ -199,6 +220,7 @@ const meta = {
   ground: await ground('Ground_2064x512.jpg'),
   sky: await sky('Sky_1774x887.png'),
 };
+for (const [name, def] of Object.entries(HILLS)) meta[name] = await hills(name, def);
 
 writeFileSync(META, `// Generado por tools/process-assets.mjs — no editar a mano.\nexport const ASSET_META = ${JSON.stringify(meta, null, 2)} as const;\n`);
 console.log(JSON.stringify(meta, null, 2));

@@ -17,6 +17,16 @@ export const FRAME = { run: [0, 1, 2, 3], jump: 4, fall: 5, hit: 6, duck: 7 } as
 
 export const CHAR_SCALE = 0.55; // el frame de carrera mide ~220 px -> ~120 px en pantalla
 
+// Capas del fondo: fracción de la velocidad del suelo a la que se mueve cada una (lo lejano, más lento)
+// y fila de pantalla donde queda la parte de abajo de cada colina (la tapa el suelo).
+export const PARALLAX = {
+  sky: 0.08,
+  hillsFar: 0.2,
+  hillsNear: 0.45,
+  hillsFarBottom: 640,
+  hillsNearBottom: 690,
+};
+
 export const PHYSICS = {
   gravity: 2600,
   fastFallGravity: 4200, // gravedad extra al pulsar abajo en el aire
