@@ -31,7 +31,8 @@ import { DashButton } from '../ui/DashButton';
 import { MuteButton } from '../ui/MuteButton';
 import { PauseButton } from '../ui/PauseButton';
 import { FullscreenButton } from '../ui/FullscreenButton';
-import { GameOverPanel } from '../ui/GameOverPanel';
+import { GameOverPanel, RankingInfo } from '../ui/GameOverPanel';
+import { fetchTop, startRun } from '../ranking';
 import { Background, lerpColor, nightAmount, TEXT_STYLE } from './background';
 
 type Body = Phaser.Physics.Arcade.Body;
@@ -114,6 +115,7 @@ export class GameScene extends Phaser.Scene {
   private countdownText?: Phaser.GameObjects.Text;
   private night = 0;
   private obstacleTint = 0xffffff;
+  private ranking!: Promise<RankingInfo>;
 
   private keys!: Keys;
   private touchJump = false;
@@ -186,6 +188,12 @@ export class GameScene extends Phaser.Scene {
     new FullscreenButton(this, 192, 48);
     if (this.character === 'relampago') this.dashButton = new DashButton(this, WIDTH - 70, HEIGHT - 66, () => this.tryDash());
     this.setupInput();
+    // Ranking online: el token de partida y el top semanal se piden ya, para tenerlos al chocar.
+    const character = this.character;
+    this.ranking = Promise.all([startRun(character), fetchTop('week')]).then(([runId, top]) => ({
+      runId,
+      top: top?.[character] ?? null,
+    }));
     playMusic(this, 'music_game');
     this.startCountdown();
 
@@ -619,17 +627,24 @@ export class GameScene extends Phaser.Scene {
 
     const restart = () => this.scene.restart({ character: this.character });
     const toMenu = () => this.scene.start('menu');
-    new GameOverPanel(this, { score: this.score, highScore: this.highScore, isRecord, onRestart: restart, onMenu: toMenu });
-
-    // Pequeña espera para no reiniciar sin querer al estar pulsando saltar.
+    // El panel avisa cuando se puede reintentar (tras la pequeña espera y, si toca, las iniciales).
     // Tocar fuera de los botones también reintenta.
-    this.time.delayedCall(GAME_OVER.inputDelayMs, () => {
+    const onActionsReady = () => {
       this.input.keyboard!.once('keydown-SPACE', restart);
       this.input.keyboard!.once('keydown-UP', restart);
       this.input.keyboard!.once('keydown-ESC', toMenu);
       this.input.on('pointerdown', (_p: Phaser.Input.Pointer, over: Phaser.GameObjects.GameObject[]) => {
         if (!over.length) restart();
       });
+    };
+    new GameOverPanel(this, {
+      score: this.score,
+      highScore: this.highScore,
+      isRecord,
+      ranking: this.ranking,
+      onRestart: restart,
+      onMenu: toMenu,
+      onActionsReady,
     });
   }
 }

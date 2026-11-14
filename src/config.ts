@@ -92,6 +92,8 @@ export const GAME_OVER = {
   recordDelayMs: 350, // la etiqueta de récord sale con el sonido `record`
   recordSparks: 18,
   buttonSize: 96,
+  rankingWaitMs: 1500, // espera máxima al ranking online si aún no ha respondido
+  afterNameDelayMs: 150, // tras las iniciales, espera antes de aceptar teclas de reintentar o menú
 };
 
 export const SPEED = {

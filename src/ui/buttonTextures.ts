@@ -33,6 +33,20 @@ export function createButtonTextures(scene: Phaser.Scene) {
     g.generateTexture('btn_menu', SIZE, SIZE);
   }
 
+  if (!scene.textures.exists('btn_ranking')) {
+    g.clear();
+    circle(g, 0x9fb7c9);
+    // Copa: cuerpo, asas, pie y base.
+    g.fillStyle(INK).fillRoundedRect(c - 19, c - 26, 38, 30, { tl: 2, tr: 2, bl: 16, br: 16 });
+    g.lineStyle(6, INK);
+    g.beginPath().arc(c - 19, c - 14, 9, Math.PI * 0.5, Math.PI * 1.5).strokePath();
+    g.beginPath().arc(c + 19, c - 14, 9, -Math.PI * 0.5, Math.PI * 0.5).strokePath();
+    g.fillRect(c - 4, c + 2, 8, 12);
+    g.fillRoundedRect(c - 16, c + 13, 32, 10, 3);
+    g.fillStyle(0xe0b030).fillCircle(c, c - 14, 6);
+    g.generateTexture('btn_ranking', SIZE, SIZE);
+  }
+
   g.destroy();
 }
 

@@ -59,9 +59,11 @@ export class MenuScene extends Phaser.Scene {
     kb.on('keydown-RIGHT', () => this.select(1));
     kb.on('keydown-SPACE', () => this.startGame());
     kb.on('keydown-ENTER', () => this.startGame());
+    kb.on('keydown-R', () => this.openRanking());
 
     new MuteButton(this, 48, 48);
     new FullscreenButton(this, 120, 48);
+    this.createRankingButton();
     this.select(this.selected, true);
     playMusic(this, 'music_menu');
   }
@@ -76,6 +78,29 @@ export class MenuScene extends Phaser.Scene {
       else s.stop().setFrame(0);
       this.labels[j].setAlpha(active ? 1 : 0.6).setScale(active ? 1.1 : 0.9);
     });
+  }
+
+  // Botón del ranking online, arriba a la derecha (también con la tecla R).
+  private createRankingButton() {
+    const size = 76;
+    const x = WIDTH - 62;
+    const img = this.add.image(x, 56, 'btn_ranking').setDisplaySize(size, size).setDepth(40);
+    this.add
+      .text(x, 56 + size / 2 + 14, 'Ranking', { ...TEXT_STYLE, fontSize: '22px', color: '#f7f0e4', stroke: '#3b2f2f', strokeThickness: 6 })
+      .setOrigin(0.5)
+      .setDepth(40);
+    const radius = img.width / 2;
+    img
+      .setInteractive(new Phaser.Geom.Circle(radius, img.height / 2, radius), Phaser.Geom.Circle.Contains)
+      .on('pointerover', () => img.setDisplaySize(size * 1.08, size * 1.08))
+      .on('pointerout', () => img.setDisplaySize(size, size))
+      .on('pointerdown', () => this.openRanking());
+    if (img.input) img.input.cursor = 'pointer';
+  }
+
+  private openRanking() {
+    playSfx(this, 'ui_select', 0);
+    this.scene.start('ranking');
   }
 
   private startGame() {

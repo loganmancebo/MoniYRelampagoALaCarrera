@@ -1,0 +1,19 @@
+# Servidor del ranking online (Cloudflare Worker + base de datos D1).
+name = "moni-ranking"
+main = "src/index.ts"
+compatibility_date = "2026-04-01"
+workers_dev = true
+preview_urls = false
+
+# Webs que pueden usar la API (CORS): el juego publicado y el servidor de desarrollo.
+[vars]
+ALLOWED_ORIGINS = "https://loganmancebo.github.io,http://localhost:5173,http://localhost:4173"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "moni-ranking"
+database_id = "438a88ec-f89b-43ef-8c80-11156eefac9b"
+
+# Limpieza diaria de tokens de partida viejos.
+[triggers]
+crons = ["0 4 * * *"]

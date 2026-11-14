@@ -16,6 +16,10 @@ Idioma del proyecto: **español** (textos del juego, comentarios, commits y conv
 - `npm run dev` — servidor de desarrollo en http://localhost:5173 (también `.claude/launch.json` → "game").
 - `npm run build` — `tsc --noEmit` + build de producción en `dist/` (rutas relativas, `base: './'`, se puede servir desde cualquier carpeta).
 - **Publicación**: `.github/workflows/deploy.yml` compila y publica en GitHub Pages en cada push a `main`.
+- **Ranking online** (`server/`, Cloudflare Worker + D1): `cd server && npm run db:local && npm run dev` lo arranca en
+  http://localhost:8787 (el juego en desarrollo lo usa por `.env.development`). `npm run deploy` lo publica;
+  `npm run db:remote` aplica las migraciones en la base de datos de Cloudflare. Usa **wrangler 4.86.0** fijado: las
+  versiones nuevas piden Node 22. El Worker **no** se publica con el push; hay que hacer `npm run deploy` si cambia.
 - `npm run assets` — regenera las imágenes de `public/assets/` y `src/generated/assets.ts` a partir de las imágenes originales.
 - No hay tests automáticos; la verificación se hace jugando (ver "Cómo probar").
 
@@ -45,6 +49,11 @@ src/ui/DashButton.ts        Botón del dash de Relámpago con indicador de recar
 src/ui/GameOverPanel.ts     Panel de fin de partida: puntuación, récord y botones `btn_restart` / `btn_menu`.
 src/ui/buttonTextures.ts    Texturas provisionales de `btn_restart` y `btn_menu` si no hay imagen cargada.
 src/types/zzfx.d.ts         Tipos mínimos de zzfx.
+src/ranking.ts              Cliente del ranking online (fetch); si falla la red devuelve null y el juego sigue.
+src/shared/ranking.ts       Reglas compartidas con el servidor: `RANKING`, nombres válidos, puntuación máxima creíble.
+src/scenes/RankingScene.ts  Pantalla de ranking (top 10 por personaje, semana / siempre).
+src/ui/NameEntry.ts         Selector de 3 iniciales estilo recreativa.
+server/                     Worker de Cloudflare (`src/index.ts`), migraciones de D1 y `wrangler.toml`.
 ```
 
 ## Sonido (resumen; detalle en docs/SONIDO.md)
@@ -138,6 +147,14 @@ Al añadir arte nuevo: añadirlo al script, ejecutar `npm run assets` y revisar 
   de los botones reintenta, ESC vuelve al menú. Todo se activa tras `GAME_OVER.inputDelayMs` (config.ts).
   Para el arte definitivo de los botones basta `this.load.image('btn_restart', ...)` en PreloadScene.
   Al probarlo forzando `gameOver()` con una puntuación alta se guarda un récord falso: restaurar `moni.highscore`.
+- **Ranking online**: al empezar cada partida se piden un token (`POST /run`) y el top semanal. Si la puntuación
+  entra en el top 10 semanal de su personaje, el game over pide 3 iniciales (A-Z, lista de palabrotas en
+  `src/shared/ranking.ts`) y las envía (`POST /score`). El servidor gasta el token y rechaza puntuaciones mayores que
+  la máxima posible en el tiempo real transcurrido (`maxPlausibleScore`, usa `SPEED`, `DASH` y `SCORE_PER_PX`): si
+  cambias la velocidad o la puntuación, el servidor también hay que volver a publicarlo. La IP solo se guarda como hash
+  para limitar partidas. Semana = desde el lunes 00:00 UTC. URL del servidor en `VITE_RANKING_URL` (`.env.*`).
+  Mientras se escriben las iniciales, `registry.get('typingName')` es true y la tecla M no silencia.
+  Al probarlo en local se llena la base de datos local (`server/.wrangler/`), no la de verdad.
 - **Silencio**: botón arriba a la izquierda o tecla M (menú, partida y pausa).
 - **Pantalla completa** (`src/fullscreen.ts`, `src/ui/FullscreenButton.ts`): se activa sola con el primer toque
   (solo una vez por carga) e intenta bloquear en horizontal; botón de esquinas junto a los de silencio/pausa.

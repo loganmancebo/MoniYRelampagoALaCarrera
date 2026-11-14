@@ -96,6 +96,16 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] Opcional: publicar también en itch.io.
 - [ ] Título, descripción e imagen para compartir en redes (Open Graph).
 
+## 🏆 Ranking online (servidor en `server/`, Cloudflare Workers + D1)
+
+- [x] Servidor: token de partida, envío con comprobación de puntuación creíble, top semanal y de siempre.
+- [x] Iniciales de 3 letras estilo recreativa en el game over (solo si entras en el top 10 semanal).
+- [x] Pantalla de ranking desde el menú (botón de la copa o tecla R), con tus iniciales resaltadas.
+- [x] Publicado en https://moni-ranking.loganyjose.workers.dev (URL en `.env.production`).
+- [ ] Opcional: publicar el Worker desde GitHub Actions (necesita un API token de Cloudflare como secreto).
+- [ ] Opcional: Cloudflare Turnstile si aparecen bots.
+- [ ] Revisar de vez en cuando nombres y puntuaciones raras (`wrangler d1 execute moni-ranking --remote --command "..."`).
+
 ## Arte pendiente (por bloques)
 
 **Bloque 2: juego completo**
@@ -125,5 +135,4 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 
 - Desbloqueables: gorros o colores alternativos con los rayos recogidos
 - Logros (100 saltos, 1000 puntos sin agacharse…)
-- Ranking online (Supabase o Firebase)
 - Modo para dos jugadores en el mismo teclado: Moni contra Relámpago

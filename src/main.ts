@@ -4,6 +4,7 @@ import { PreloadScene } from './scenes/PreloadScene';
 import { MenuScene } from './scenes/MenuScene';
 import { GameScene } from './scenes/GameScene';
 import { PauseScene } from './scenes/PauseScene';
+import { RankingScene } from './scenes/RankingScene';
 import { autoFullscreenOnFirstTouch } from './fullscreen';
 
 async function start() {
@@ -25,7 +26,7 @@ async function start() {
       arcade: { debug: new URLSearchParams(location.search).has('debug') },
     },
     input: { activePointers: 3 },
-    scene: [PreloadScene, MenuScene, GameScene, PauseScene],
+    scene: [PreloadScene, MenuScene, GameScene, PauseScene, RankingScene],
   });
   autoFullscreenOnFirstTouch();
   if (import.meta.env.DEV) (window as unknown as { game: Phaser.Game }).game = game;

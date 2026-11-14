@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { isMuted, toggleMute } from '../audio';
+import { TYPING_KEY } from './NameEntry';
 
 const RADIUS = 28;
 const INK = 0x3b2f2f;
@@ -15,7 +16,9 @@ export class MuteButton {
       .setInteractive(new Phaser.Geom.Circle(0, 0, RADIUS + 6), Phaser.Geom.Circle.Contains)
       .on('pointerdown', () => this.toggle());
     if (this.gfx.input) this.gfx.input.cursor = 'pointer';
-    scene.input.keyboard?.on('keydown-M', () => this.toggle());
+    scene.input.keyboard?.on('keydown-M', () => {
+      if (!scene.registry.get(TYPING_KEY)) this.toggle();
+    });
     this.draw();
   }
 
