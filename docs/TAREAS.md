@@ -96,15 +96,16 @@ Estado a 24/10/2026. Marca `[x]` al terminar cada tarea.
 - [ ] Opcional: publicar también en itch.io.
 - [ ] Título, descripción e imagen para compartir en redes (Open Graph).
 
-## 🏆 Ranking online (servidor en `server/`, Cloudflare Workers + D1)
+## 🏆 Ranking online (servidor en `server/`, Netlify Functions + Postgres en Neon)
 
 - [x] Servidor: token de partida, envío con comprobación de puntuación creíble, top semanal y de siempre.
 - [x] Iniciales de 3 letras estilo recreativa en el game over (solo si entras en el top 10 semanal).
 - [x] Pantalla de ranking desde el menú (botón de la copa o tecla R), con tus iniciales resaltadas.
-- [x] Publicado en https://moni-ranking.loganyjose.workers.dev (URL en `.env.production`).
-- [ ] Opcional: publicar el Worker desde GitHub Actions (necesita un API token de Cloudflare como secreto).
-- [ ] Opcional: Cloudflare Turnstile si aparecen bots.
-- [ ] Revisar de vez en cuando nombres y puntuaciones raras (`wrangler d1 execute moni-ranking --remote --command "..."`).
+- [x] ~~Publicado en Cloudflare Workers + D1~~: en España se bloquean IPs de Cloudflare durante los partidos de LaLiga.
+- [x] Movido a Netlify Functions + Neon: https://moniyrelampagoalacarrera.netlify.app (URL en `.env.production`),
+      se publica solo con cada push que cambie el servidor.
+- [ ] Opcional: un captcha invisible si aparecen bots (no Turnstile: es de Cloudflare).
+- [ ] Revisar de vez en cuando nombres y puntuaciones raras (consola SQL de Neon).
 
 ## Arte pendiente (por bloques)
 
