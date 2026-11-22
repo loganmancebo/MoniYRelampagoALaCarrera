@@ -3,15 +3,17 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "wrangler dev",
-    "db:local": "wrangler d1 migrations apply moni-ranking --local",
-    "db:remote": "wrangler d1 migrations apply moni-ranking --remote",
-    "deploy": "wrangler deploy",
+    "dev": "tsx scripts/dev.ts",
+    "db:migrate": "node --env-file-if-exists=.env --import tsx scripts/migrate.ts",
     "typecheck": "tsc --noEmit"
   },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.2.1"
+  },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260501.0",
-    "typescript": "^5.8.3",
-    "wrangler": "4.86.0"
+    "@electric-sql/pglite": "^0.5.17",
+    "@types/node": "^22.15.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.8.3"
   }
 }

@@ -3,18 +3,18 @@ CREATE TABLE runs (
   id TEXT PRIMARY KEY,
   character TEXT NOT NULL,
   ip_hash TEXT NOT NULL,
-  started_at INTEGER NOT NULL, -- ms
-  used INTEGER NOT NULL DEFAULT 0
+  started_at BIGINT NOT NULL, -- ms
+  used BOOLEAN NOT NULL DEFAULT FALSE
 );
 CREATE INDEX runs_ip ON runs (ip_hash, started_at);
 
 -- Puntuaciones del ranking: cada partida es una entrada, como en las recreativas.
 CREATE TABLE scores (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  id SERIAL PRIMARY KEY,
   name TEXT NOT NULL,
   character TEXT NOT NULL,
   score INTEGER NOT NULL,
-  created_at INTEGER NOT NULL, -- ms
+  created_at BIGINT NOT NULL, -- ms
   run_id TEXT NOT NULL UNIQUE
 );
 CREATE INDEX scores_top ON scores (character, score DESC);

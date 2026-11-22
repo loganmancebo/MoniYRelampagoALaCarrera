@@ -1,0 +1,15 @@
+# Netlify publica solo el servidor del ranking (carpeta server/); el juego sigue en GitHub Pages.
+[build]
+  base = "server"
+  publish = "public"
+  command = "npm run typecheck"
+  # Solo se vuelve a publicar si cambia el servidor o las reglas que comparte con el juego.
+  # En la primera publicación (o al publicar a mano el mismo commit) se publica siempre.
+  ignore = "[ \"$CACHED_COMMIT_REF\" = \"$COMMIT_REF\" ] && exit 1; git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF -- . ../src/shared ../src/config.ts ../src/generated"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
